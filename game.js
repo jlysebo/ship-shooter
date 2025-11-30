@@ -2,11 +2,10 @@ import { Player } from "./src/player.js";
 import { keys, setupInput } from "./src/input.js";
 import { Settings } from "./src/settings.js";
 import { drawRotatedImage } from "./src/tools/drawRotatedImage.js";
-import { getQuadrant } from "./src/tools/getQuadrant.js";
-import { Bullet } from "./src/bullet.js";
-import { Enemy } from "./src/enemy.js";
-import { randomInteger, randomXY } from "./src/tools/randomInteger.js";
-import { distance } from "./src/tools/pythagoras.js";
+import { rib } from "./src/rib.js";
+import { randomDecimal, randomInteger, randomXY } from "./src/tools/random.js";
+import { distance } from "./src/tools/calculations.js";
+import { Destroyer } from "./src/destroyer.js";
 
 class Game {
     constructor(canvas) {
@@ -22,7 +21,12 @@ function drawCanvas() {
     drawRotatedImage(playerImg, player.x, player.y, player.angle);
     drawRotatedImage(cannonImg, player.x, player.y, player.shotAngle);
     player.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
-    enemies.forEach(enemy => drawRotatedImage(enemy1Img, enemy.x, enemy.y, enemy.angle));
+    enemies.forEach(enemy => {
+        drawRotatedImage(enemy1Img, enemy.x, enemy.y, enemy.angle);
+        if (enemy instanceof Destroyer) {
+            enemy.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
+        }
+    });
 }
 
 /**
@@ -30,19 +34,24 @@ function drawCanvas() {
  * @param {*} buffer 
  */
 function spawnEnemy(buffer) {
+    let dice = Math.floor(randomInteger(1, 7));
     let xy = randomXY();
     while (distance(player.x, player.y, xy[0], xy[1]) < buffer) {
         xy = randomXY();
     }
-    enemies.push(new Enemy(xy[0], xy[1], randomInteger(0, 6), randomInteger(1.5, Math.max(3, player.stats.level*0.5)), enemy1Img.width, enemy1Img.height, 1));
+    if (dice == 6) {
+        enemies.push(new Destroyer(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), enemy1Img.width, enemy1Img.height, 1, randomInteger(280, 450), randomInteger(2000, 3000)));
+    }
+    else {
+        enemies.push(new rib(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.3, Math.max(2.4, player.stats.level * 0.4)), enemy1Img.width, enemy1Img.height, 1));
+    }
 }
 
 function updateEnemies() {
     // add new enemies
     enemies.forEach(enemy => {
-        if (player.contact(enemy)) {
-            player.takeDamage();
-        }
+        enemy.update(player);
+        // updates hitpoints for all player bullets.
         player.bullets.forEach(bullet => {
             if (enemy.contact(bullet)) {
                 enemy.hitPoints -= 1;
@@ -52,8 +61,34 @@ function updateEnemies() {
                 }
             }
         })
-        enemy.adjustAngle(player);
-        enemy.update();
+        // player takes damage.
+        if (player.contact(enemy)) {
+            player.takeDamage();
+        }
+        // If enemy is a Destroyer, loop through all its bullets.
+        if (enemy instanceof Destroyer) {
+            enemy.bullets.forEach(bullet => {
+                // enemy hits player.
+                if (player.contact(bullet)) {
+                    player.takeDamage();
+                    bullet.hitPoints -= 1;
+                }
+                // enemy hits another enemy.
+                enemies.forEach(p => {
+                    if (p.contact(bullet) && !(p instanceof Destroyer)) {
+                        p.hitPoints -= 1;
+                        bullet.hitPoints -= 1;
+                    }
+                })
+                // bullet hits bullet.
+                player.bullets.forEach(q => {
+                    if (bullet.contact(q)) {
+                        bullet.hitPoints -= 1;
+                        q.hitPoints -= 1;
+                    }
+                })
+            })
+        }
     });
     if (enemies.length == 0) {
         for (let i = 0; i <= player.stats.level; i++) {
@@ -64,33 +99,20 @@ function updateEnemies() {
     enemies = enemies.filter(enemy => enemy.hitPoints > 0);
 }
 
-function displayEndscreen(){
+function displayEndscreen() {
     ctx.font = "50px Arial";
     ctx.fillText("GAME OVER", 150, 300);
 }
 
 function gameLoop() {
-    //clear canvas
-    //ctx.clearRect(0, 0, Settings.window.width, Settings.window.height);
     //update player input
     player.update(keys);
     player.updateBullets();
     updateEnemies()
     drawCanvas();
 
-    //draw the ship
-    /*
- 
-    drawRotatedImage(testEnemyImg, testEnemy.x, testEnemy.y, testEnemy.angle);
-    drawRotatedImage(jolle, player.x, player.y, player.angle);
-    drawRotatedImage(cannon, player.x, player.y, player.shotAngle);
-    if (player.bullets.length > 0) {
-        player.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
-    }
-    */
 
     info.textContent = "X: " + Math.round(player.x) + ", Y: " + Math.round(player.y) + ", Angle: " + Math.round(player.angle / Math.PI * 180) + ", shotAngle: " + Math.round(player.shotAngle / Math.PI * 180);
-    a.textContent = "Bulletcount: " + player.bullets.length + ", Contact: " + ", Shot: " + keys.Space;
     stats.textContent = "Lives: " + player.hitPoints + ", Kills: " + player.stats.kills + ", Shots: " + player.stats.shots + ", Enemies: " + enemies.length;
 
     //queues next framew
@@ -98,8 +120,8 @@ function gameLoop() {
         displayEndscreen();
     }
     else {
-    requestAnimationFrame(gameLoop);
-}
+        requestAnimationFrame(gameLoop);
+    }
 }
 
 
@@ -107,7 +129,6 @@ function gameLoop() {
 //creates canvas and ship image
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-//const game = new Game(canvas);
 
 
 const playerImg = document.getElementById(Settings.img.player);
@@ -120,12 +141,8 @@ var enemies = [];
 
 
 const info = document.getElementById("info");
-const a = document.getElementById("debug");
 const stats = document.getElementById("stats");
 
-//constructs a new player
-//const player = new Player(Settings.window.width / 2 - Settings.sprite.width / 2, Settings.window.height / 2 - Settings.sprite.height / 2, 4, Math.PI, jolle.width, jolle.height, 3);
-//const testEnemy = new Enemy(100, 100, 0, 5, testEnemyImg.width, testEnemyImg.height, 3);
 //initialize input listeners
 setupInput();
 

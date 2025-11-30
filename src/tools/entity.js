@@ -1,15 +1,20 @@
 import { Settings } from "../settings.js";
-import { normalizeAngle } from "./normalizeAngle.js";
+import { normalizeAngle, calculateAngle } from "./angle.js";
 
 export class Entity {
     constructor(x, y, angle, speed, width, height, hitPoints) {
         this.x = x,
-        this.y = y,
-        this.angle = angle,
-        this.speed = speed,
-        this.width = width;
+            this.y = y,
+            this.angle = angle,
+            this.speed = speed,
+            this.width = width;
         this.height = height;
         this.hitPoints = hitPoints;
+    }
+
+    alive() {
+        if (this.hitPoints > 0) return true;
+        else return false;
     }
 
     /**
@@ -86,7 +91,11 @@ export class Entity {
     contact(entity) {
         // Uses pythagoras betwen the centre points of each entity.
         // Approximates a hitbox by making a circle with radius equal to the average between height and width.
-        if (Math.sqrt((this.x - entity.x)**2+(this.y-entity.y)**2) <= 0.90*(this.width/4+this.height/4+entity.width/4+entity.height/4)) return true;
+        if (Math.sqrt((this.x - entity.x) ** 2 + (this.y - entity.y) ** 2) <= 0.90 * (this.width / 4 + this.height / 4 + entity.width / 4 + entity.height / 4)) return true;
         else return false;
+    }
+
+    adjustAngle(entity) {
+        this.angle = calculateAngle(this.x, this.y, entity.x, entity.y);
     }
 }

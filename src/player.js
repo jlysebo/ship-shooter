@@ -1,6 +1,4 @@
-import { Settings } from "./settings.js"
-import { normalizeAngle } from "./tools/normalizeAngle.js";
-import { getQuadrant } from "./tools/getQuadrant.js";
+import { normalizeAngle } from "./tools/angle.js";
 import { Bullet } from "./bullet.js";
 import { Entity } from "./tools/entity.js";
 import { gameStats } from "./gameStats.js";
@@ -40,7 +38,7 @@ export class Player extends Entity {
 
     bulletReady() {
         const tempDate = new Date();
-        if (this.lastBulletFired.getTime() < tempDate.getTime() - 170) {
+        if (this.lastBulletFired.getTime() < tempDate.getTime() - 220) {
             return true;
         }
         else return false;
@@ -69,10 +67,10 @@ export class Player extends Entity {
             this.rotate(-Math.PI / 36);
         }
         if (keys.ArrowLeft) {
-            this.rotateCannon(-Math.PI / 36);
+            this.rotateCannon(-Math.PI / 48);
         }
         if (keys.ArrowRight) {
-            this.rotateCannon(Math.PI / 36);
+            this.rotateCannon(Math.PI / 48);
         }
         if (keys.w) {
             const nextX = this.nextX();
