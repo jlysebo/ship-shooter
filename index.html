@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Shooter</title>
+    <style>
+        canvas {
+            background: #eee;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <img id="jolle" src="assets/sprites/jolle.png" style="display:none;"></img>
+    <img id="enemyJolle" src="assets/sprites/enemyJolle.png" style="display:none;"></img>
+    <img id="cannon" src="assets/sprites/cannon.png" style="display:none;"></img>
+    <img id="missile" src="assets/sprites/missile.png" style="display:none;"></img>
+    <script type="module" src="game.js"></script>
+    <p id="info"></p>
+    <p id="debug"></p>
+    <p id="stats"></p>
+</body>
+
+</html>
