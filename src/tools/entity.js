@@ -91,7 +91,7 @@ export class Entity {
     contact(entity) {
         // Uses pythagoras betwen the centre points of each entity.
         // Approximates a hitbox by making a circle with radius equal to the average between height and width.
-        if (Math.sqrt((this.x - entity.x) ** 2 + (this.y - entity.y) ** 2) <= 0.90 * (this.width / 4 + this.height / 4 + entity.width / 4 + entity.height / 4)) return true;
+        if (Math.sqrt((this.x - entity.x) ** 2 + (this.y - entity.y) ** 2) <= 0.80 * (this.width / 4 + this.height / 4 + entity.width / 4 + entity.height / 4)) return true;
         else return false;
     }
 

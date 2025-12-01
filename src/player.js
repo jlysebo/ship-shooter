@@ -67,10 +67,10 @@ export class Player extends Entity {
             this.rotate(-Math.PI / 36);
         }
         if (keys.ArrowLeft) {
-            this.rotateCannon(-Math.PI / 48);
+            this.rotateCannon(-Math.PI / 60);
         }
         if (keys.ArrowRight) {
-            this.rotateCannon(Math.PI / 48);
+            this.rotateCannon(Math.PI / 60);
         }
         if (keys.w) {
             const nextX = this.nextX();

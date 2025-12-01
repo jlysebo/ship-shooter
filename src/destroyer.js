@@ -22,6 +22,9 @@ export class Destroyer extends Enemy {
             this.bullets.push(new Bullet(this.x, this.y, this.angle, 10, 11, 11, 1))
             this.lastShotTime = tempDate;
         }
+        else {
+            this.adjustAngle(player);
+        }
         this.bullets.forEach(bullet => bullet.move());
         this.bullets = this.bullets.filter(bullet => bullet.alive);
     }

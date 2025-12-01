@@ -22,8 +22,11 @@ function drawCanvas() {
     drawRotatedImage(cannonImg, player.x, player.y, player.shotAngle);
     player.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
     enemies.forEach(enemy => {
-        drawRotatedImage(enemy1Img, enemy.x, enemy.y, enemy.angle);
+        if (enemy instanceof rib) {
+            drawRotatedImage(enemy1Img, enemy.x, enemy.y, enemy.angle);
+        }
         if (enemy instanceof Destroyer) {
+            drawRotatedImage(destroyerImg, enemy.x, enemy.y, enemy.angle);
             enemy.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
         }
     });
@@ -40,7 +43,7 @@ function spawnEnemy(buffer) {
         xy = randomXY();
     }
     if (dice == 6) {
-        enemies.push(new Destroyer(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), enemy1Img.width, enemy1Img.height, 1, randomInteger(280, 450), randomInteger(2000, 3000)));
+        enemies.push(new Destroyer(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), 35, 85, 1, randomInteger(280, 450), randomInteger(2000, 3000)));
     }
     else {
         enemies.push(new rib(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.3, Math.max(2.4, player.stats.level * 0.4)), enemy1Img.width, enemy1Img.height, 1));
@@ -135,6 +138,7 @@ const playerImg = document.getElementById(Settings.img.player);
 const cannonImg = document.getElementById(Settings.img.cannon);
 const bulletImg = document.getElementById(Settings.img.bullet);
 const enemy1Img = document.getElementById(Settings.img.enemy1);
+const destroyerImg = document.getElementById(Settings.img.destroyer);
 
 const player = new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3);
 var enemies = [];

@@ -14,7 +14,8 @@ export const Settings = {
         player: "jolle",
         cannon: "cannon",
         bullet: "missile",
-        enemy1: "enemyJolle"
+        enemy1: "enemyJolle",
+        destroyer: "destroyer"
     }
 }
 
