@@ -1,16 +1,15 @@
 import { normalizeAngle } from "./tools/angle.js";
 import { Bullet } from "./bullet.js";
 import { Entity } from "./tools/entity.js";
-import { gameStats } from "./gameStats.js";
+import { Weapon } from "./weapon.js";
 
 export class Player extends Entity {
-    constructor(x, y, angle, speed, width, height, hitPoints) {
+    constructor(x, y, angle, speed, width, height, hitPoints, stats) {
         super(x, y, angle, speed, width, height, hitPoints);
+        this.stats = stats;
         this.shotAngle = angle;
-        this.bullets = [];
-        this.lastBulletFired = new Date();
         this.lastDamage = new Date();
-        this.stats = new gameStats();
+        this.weapon = new Weapon(300, 100, 200);
     }
 
 
@@ -32,16 +31,7 @@ export class Player extends Entity {
     }
 
     updateBullets() {
-        this.bullets.forEach(bullet => bullet.move());
-        this.bullets = this.bullets.filter(bullet => bullet.alive);
-    }
-
-    bulletReady() {
-        const tempDate = new Date();
-        if (this.lastBulletFired.getTime() < tempDate.getTime() - 220) {
-            return true;
-        }
-        else return false;
+        this.weapon.updateBullets();
     }
 
     /**
@@ -82,10 +72,9 @@ export class Player extends Entity {
                 this.moveY(nextY);
             }
         }
-        if (keys.Space && this.bulletReady()) {
-            this.bullets.push(new Bullet(this.x, this.y, this.shotAngle, 10, 11, 11, 1));
-            this.lastBulletFired = new Date();
-            this.stats.registerShot();
+        if (keys.Space) {
+            this.weapon.fire(this.x, this.y, this.shotAngle);
         }
+        this.weapon.update();
     }
 }
