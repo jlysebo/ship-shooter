@@ -15,7 +15,8 @@ export const Settings = {
         cannon: "cannon",
         bullet: "missile",
         enemy1: "enemyJolle",
-        destroyer: "destroyer"
+        destroyer: "destroyer",
+        coin_1: "coin1"
     }
 }
 
