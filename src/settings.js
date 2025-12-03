@@ -17,6 +17,9 @@ export const Settings = {
         enemy1: "enemyJolle",
         destroyer: "destroyer",
         coin_1: "coin1"
+    },
+    render: {
+        delay: 100 // milliseconds
     }
 }
 
