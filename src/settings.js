@@ -2,8 +2,8 @@
 
 export const Settings = {
     window: {
-        width: 600,
-        height: 600,
+        width: 650,
+        height: 650,
         margin: 25
     },
     sprite: {
