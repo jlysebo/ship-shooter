@@ -1,5 +1,5 @@
 import { Player } from "./src/player.js";
-import { keys, setupInput } from "./src/input.js";
+import { keys, setupInput, supportsGamepads } from "./src/input.js";
 import { Settings } from "./src/settings.js";
 import { drawRotatedImage } from "./src/tools/drawRotatedImage.js";
 import { rib } from "./src/rib.js";
@@ -8,6 +8,7 @@ import { distance } from "./src/tools/calculations.js";
 import { Destroyer } from "./src/destroyer.js";
 import { gameStats } from "./src/gameStats.js";
 import { Coin } from "./src/coin.js";
+import { statElement } from "./src/tools/statElement.js";
 
 class Game {
     constructor(canvas) {
@@ -120,6 +121,7 @@ function updateEnemies() {
 function displayEndscreen() {
     ctx.font = "50px Arial";
     ctx.fillText("GAME OVER", 150, 300);
+    startButtonValid = true;
 }
 
 function gameLoop() {
@@ -131,8 +133,8 @@ function gameLoop() {
     drawCanvas();
 
 
-    info.textContent = "X: " + Math.round(player.x) + ", Y: " + Math.round(player.y) + ", Angle: " + Math.round(player.angle / Math.PI * 180) + ", shotAngle: " + Math.round(player.shotAngle / Math.PI * 180) + " Ammo: " + player.weapon.ammo;
-    statsLabel.textContent = "Lives: " + player.hitPoints + ", Kills: " + stats.kills + ", Shots: " + stats.shots + ", Coins: " + stats.coins;
+    info.textContent = "X: " + Math.round(player.x) + ", Y: " + Math.round(player.y) + ", Angle: " + Math.round(player.angle / Math.PI * 180) + "\nshotAngle: " + Math.round(player.shotAngle / Math.PI * 180) + " Ammo: " + player.weapon.ammo;
+    statsLabel.textContent = "Lives: " + player.hitPoints + ", Kills: " + stats.kills + "Shots: " + stats.shots + ", Coins: " + stats.coins;
 
     //queues next framew
     if (player.hitPoints < 1 || keys.p) {
@@ -157,17 +159,37 @@ const enemy1Img = document.getElementById(Settings.img.enemy1);
 const destroyerImg = document.getElementById(Settings.img.destroyer);
 const coin1Img = document.getElementById(Settings.img.coin_1);
 
-const stats = new gameStats();
-const player = new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats);
-var enemies = [];
+
 
 
 
 const info = document.getElementById("info");
 const statsLabel = document.getElementById("stats");
+const statsContainer = document.getElementById('stats-container');
+const startButton = document.getElementById("start-button")
+var startButtonValid = true;
 
+const statsDisplay = [
+    new statElement("text", 2, true, 1)
+];
+
+statsDisplay.forEach(stat => statsContainer.appendChild(stat.render()));
+
+const stats = new gameStats();
+const player = new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats);
+var enemies = [];
+
+function startGame() {
+    console.log("started");
+    setupInput();
+    supportsGamepads();
+    gameLoop();
+}
 //initialize input listeners
-setupInput();
-
+startButton.addEventListener('click', () => {
+    if (startButtonValid) {
+        startGame();
+        startButtonValid = false;
+    }
+})
 //starts first loop
-gameLoop();
