@@ -161,7 +161,8 @@ const stats = new gameStats();
 const player = new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats);
 var enemies = [];
 
-
+// initialize timer
+let time = 0;
 
 const info = document.getElementById("info");
 const statsLabel = document.getElementById("stats");
