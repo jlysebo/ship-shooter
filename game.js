@@ -1,6 +1,6 @@
 import { Player } from "./src/player.js";
 import { keys, setupInput } from "./src/input.js";
-import { Settings } from "./src/settings.js";
+import settings, { Settings } from "./src/settings.js";
 import { drawRotatedImage } from "./src/tools/drawRotatedImage.js";
 import { rib } from "./src/rib.js";
 import { randomDecimal, randomInteger, randomXY } from "./src/tools/random.js";
@@ -123,17 +123,23 @@ function displayEndscreen() {
 }
 
 function gameLoop() {
-    //update player input
-    player.update(keys);
-    player.updateBullets();
-    updateEnemies()
-    updateCoins();
-    drawCanvas();
-
-
-    info.textContent = "X: " + Math.round(player.x) + ", Y: " + Math.round(player.y) + ", Angle: " + Math.round(player.angle / Math.PI * 180) + ", shotAngle: " + Math.round(player.shotAngle / Math.PI * 180) + " Ammo: " + player.weapon.ammo;
-    statsLabel.textContent = "Lives: " + player.hitPoints + ", Kills: " + stats.kills + ", Shots: " + stats.shots + ", Coins: " + stats.coins;
-
+    const now = new Date().getTime();
+    if(now > time + settings.render.delay) {
+        // reset time
+        time = now;
+        
+        //update player input
+        player.update(keys);
+        player.updateBullets();
+        updateEnemies()
+        updateCoins();
+        drawCanvas();
+        
+        
+        info.textContent = "X: " + Math.round(player.x) + ", Y: " + Math.round(player.y) + ", Angle: " + Math.round(player.angle / Math.PI * 180) + ", shotAngle: " + Math.round(player.shotAngle / Math.PI * 180) + " Ammo: " + player.weapon.ammo;
+        statsLabel.textContent = "Lives: " + player.hitPoints + ", Kills: " + stats.kills + ", Shots: " + stats.shots + ", Coins: " + stats.coins;
+    }
+        
     //queues next framew
     if (player.hitPoints < 1 || keys.p) {
         displayEndscreen();
