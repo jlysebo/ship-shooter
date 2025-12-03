@@ -19,7 +19,7 @@ export const Settings = {
         coin_1: "coin1"
     },
     render: {
-        delay: 100 // milliseconds
+        delay: 50 // milliseconds
     }
 }
 
