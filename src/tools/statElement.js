@@ -1,31 +1,22 @@
 export class statElement {
-    constructor(label, value, upgradable, upgradeIncrement = 0) {
-        this.label = label;
-        this.value = value;
+    constructor(upgradable) {
         this.upgradable = upgradable;
-        this.upgradeIncrement = upgradeIncrement;
-        this.upgradeCost = 1;
     }
 
     render() {
         const container = document.createElement('div');
         container.className = 'stats-container';
-        let temp = "";
-        if (this.upgradable) {
-            temp = `<button class="upgrade-button">Upgrade: ${this.upgradeCost}</button>`
-        }
         container.innerHTML = `
-        <span class="stat-label">${this.label}:</span>
-        <span class="value-label">${this.value}:</span>
-        ${temp}
+        <span class="stat-label">${this.upgradable.name}:</span>
+        <span class="value-label">${this.upgradable.value}:</span>
+        <button class="upgrade-button">Upgrade cost: ${this.upgradable.cost}</button>
         `;
 
-        if (this.upgradable) {
-            container.querySelector('.upgrade-button').addEventListener('click', () => {
-                this.value += this.upgradeIncrement;
-                container.querySelector('.value-label').textContent = this.value;
-            })
-        }
+        container.querySelector('.upgrade-button').addEventListener('click', () => {
+            this.upgradable.upgrade();
+            container.querySelector('.value-label').textContent = this.upgradable.value;
+            container.querySelector('.upgrade-button').textContent = "Upgrade cost: " + this.upgradable.cost;
+        })
         return container;
 
     }

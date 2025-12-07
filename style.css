@@ -22,7 +22,7 @@
     
 }
 
-.stat-box {
+.stats-container {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -34,7 +34,7 @@
 
 .stat-label {
   font-weight: bold;
-  width: 100px;
+  width: 200px;
 }
 
 .value-label {
@@ -45,6 +45,7 @@
 .upgrade-button {
   padding: 4px 8px;
   cursor: pointer;
+  width: 100px;
 }
 .upgrade-button:disabled {
   background: #ccc;
