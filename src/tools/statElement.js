@@ -14,7 +14,7 @@ export class statElement {
 
         container.querySelector('.upgrade-button').addEventListener('click', () => {
             this.upgradable.upgrade();
-            container.querySelector('.value-label').textContent = this.upgradable.value;
+            container.querySelector('.value-label').textContent = this.upgradable.value + ":";
             container.querySelector('.upgrade-button').textContent = "Upgrade cost: " + this.upgradable.cost;
         })
         return container;

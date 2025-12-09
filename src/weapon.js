@@ -2,11 +2,12 @@ import { Bullet } from "./bullet.js";
 import { Upgradable } from "./tools/upgradable.js";
 
 export class Weapon {
-    constructor(shotDelay, capacity, reloadDelay) {
-        this.shotDelay = new Upgradable("Shot Delay", shotDelay, -5, 40, 20, 20);
-        this.capacity = new Upgradable("Ammo Capacity", capacity, 10, 20, 1, 1000);
-        this.reloadDelay = new Upgradable("Reload Delay", reloadDelay, -5, 40, 20, 20);
-        this.bulletSpeed = new Upgradable("Bullet Speed", 10, 0.5, 50, 50, 10);
+    constructor(shotDelay, capacity, reloadDelay, stats) {
+        this.shotDelay = new Upgradable("Shot Delay", shotDelay, -5, 40, 20, 20, stats);
+        this.capacity = new Upgradable("Ammo Capacity", capacity, 10, 20, 1, 1000, stats);
+        this.reloadDelay = new Upgradable("Reload Delay", reloadDelay, -5, 40, 20, 20, stats);
+        this.stats = stats;
+        this.bulletSpeed = new Upgradable("Bullet Speed", 10, 0.5, 50, 50, 10, stats);
         this.ammo = capacity;
         this.reloadAmount = 1;
         this.bullets = [];
@@ -42,7 +43,6 @@ export class Weapon {
         if (this.lastReloadTime.getTime() < tempDate.getTime() - this.reloadDelay.value && this.ammo < this.capacity.value && this.lastBulletFired.getTime() < tempDate.getTime() - this.reloadDelay.value * 2) {
             if (this.ammo + this.reloadAmount <= this.capacity.value) {
                 this.ammo += this.reloadAmount;
-                console.log(this.lastReloadTime.getTime() - tempDate.getTime() - this.reloadDelay.value)
             }
             else this.ammo = this.capacity.value;
             this.lastReloadTime = tempDate;

@@ -9,7 +9,7 @@ export class Player extends Entity {
         this.stats = stats;
         this.shotAngle = angle;
         this.lastDamage = new Date();
-        this.weapon = new Weapon(300, 100, 200);
+        this.weapon = new Weapon(300, 100, 200, stats);
     }
 
 

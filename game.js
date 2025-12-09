@@ -166,9 +166,9 @@ var startButtonValid = true;
 
 
 function startGame() {
-
+    const stats = new gameStats();
     game = {
-        stats: new gameStats(),
+        stats: stats,
         player: new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats),
         statsDisplay: [],
         enemies: [],
