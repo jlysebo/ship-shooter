@@ -18,11 +18,13 @@ export class Destroyer extends Enemy {
             this.lastShotTime = tempDate;
         }
         else if (this.lastShotTime < tempDate - this.reloadTime) {
+            this.lastUpdate = tempDate;
             this.adjustAngle(player);
             this.bullets.push(new Bullet(this.x, this.y, this.angle, 10, 11, 11, 1))
             this.lastShotTime = tempDate;
         }
         else {
+            this.lastUpdate = tempDate;
             this.adjustAngle(player);
         }
         this.bullets.forEach(bullet => bullet.move());

@@ -76,5 +76,6 @@ export class Player extends Entity {
             this.weapon.fire(this.x, this.y, this.shotAngle);
         }
         this.weapon.update();
+        super.update();
     }
 }
