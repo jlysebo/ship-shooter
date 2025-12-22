@@ -15,8 +15,10 @@ export class Bullet extends Entity {
      * @returns true if bullet still active.
      */
     move() {
+        
         this.moveX(this.nextX());
         this.moveY(this.nextY());
+        super.update();
         if (this.x < Settings.window.width && this.x > 0 && this.y > 0 && this.y < Settings.window.height && this.hitPoints > 0) {
             return true;
         }
@@ -25,6 +27,7 @@ export class Bullet extends Entity {
             this.alive = false;
             return false;
         }
+
     }
 
 

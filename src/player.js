@@ -1,15 +1,16 @@
 import { normalizeAngle } from "./tools/angle.js";
-import { Bullet } from "./bullet.js";
 import { Entity } from "./tools/entity.js";
 import { Weapon } from "./weapon.js";
+import { Upgradable } from "./tools/upgradable.js";
 
 export class Player extends Entity {
     constructor(x, y, angle, speed, width, height, hitPoints, stats) {
         super(x, y, angle, speed, width, height, hitPoints);
+        this.speed = new Upgradable("Ship Speed", speed, 0.25, 10, 5, 4, stats);
         this.stats = stats;
         this.shotAngle = angle;
         this.lastDamage = new Date();
-        this.weapon = new Weapon(300, 100, 200);
+        this.weapon = new Weapon(700, 50, 1000, stats);
     }
 
 
@@ -46,6 +47,36 @@ export class Player extends Entity {
     }
 
     /**
+         * Calculates next X position.
+         * @returns next X.
+         */
+    nextX() {
+        let tempDate = new Date();
+        if (this.lastUpdate == null) {
+            return this.x;
+        }
+        else {
+            let millis = tempDate - this.lastUpdate;
+            return this.x + Math.cos(this.angle) * this.speed.value * (millis)/17;
+        }
+    }
+    
+    /**
+     * Calculates next Y position.
+     * @returns next Y.
+    */
+   nextY() {
+        let tempDate = new Date();
+        if (this.lastUpdate == null) {
+            return this.y;
+        }
+        else {
+            let millis = tempDate - this.lastUpdate;
+            return this.y + Math.sin(this.angle) * this.speed.value * (millis)/17;
+        }
+    }
+
+    /**
      * Updates player position
      * @param {*} keys a list of booleans of keys pressed
      */
@@ -76,5 +107,6 @@ export class Player extends Entity {
             this.weapon.fire(this.x, this.y, this.shotAngle);
         }
         this.weapon.update();
+        super.update();
     }
 }

@@ -11,5 +11,6 @@ export class Enemy extends Entity {
         let y = this.nextY();
         if (this.validateX(x)) this.moveX(x);
         if (this.validateY(y)) this.moveY(y);
+        super.update();
     }
 }

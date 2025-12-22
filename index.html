@@ -15,16 +15,56 @@
 </head>
 
 <body>
-    <canvas id="gameCanvas" width="600" height="600"></canvas>
-    <img id="jolle" src="assets/sprites/jolle.png" style="display:none;"></img>
-    <img id="enemyJolle" src="assets/sprites/enemyJolle.png" style="display:none;"></img>
-    <img id="cannon" src="assets/sprites/cannon.png" style="display:none;"></img>
-    <img id="missile" src="assets/sprites/missile.png" style="display:none;"></img>
-    <img id="destroyer" src="assets/sprites/destroyer.png" style="display:none;"></img>
-    <img id="coin1" src="assets/sprites/coin1.png" style="display:none;"></img>
+    <div class="split left">
+        <div class="title">Ship-Shooter</div>
+        <div class="how-to-play" id="how-to-play">
+            <h3>How to Play:</h3>
+            <ul>
+                <li>Use WAD to move and arrows to aim cannon.</li>
+                <li>Shoot enemies with spacebar.</li>
+                <li>Collect coins to earn points for upgrades.</li>
+                <li>Avoid enemy ships and their missiles.</li>
+            </ul>
+        </div>
+        <div class="upgrade-container" style="visibility:hidden;" id="upgrade-container">
+            <p>Upgrades:</p>
+            <div id="stats-container"></div>
+        </div>
+        <div class="info-container" style="visibility:hidden;" id="info-container">
+            <div id="stats-container">
+            </div>
+            <div class="grid-container">
+                <div class="grid-item">
+                    <img src="assets/sprites/coin1.png" alt="Coins" class="icon"></img>
+                    <span class="stat-label"></span> <span id="health-value">0</span>
+                </div>
+                <div class="grid-item">
+                    <img src="assets/sprites/missile.png" alt="Missile" class="icon"></img>
+                    <span class="stat-label"></span> <span id="ammo-value">0</span>
+                </div>
+                <div class="grid-item">
+                    <img src="assets/sprites/coin1.png" alt="Coins" class="icon"></img>
+                    <span class="stat-label"></span> <span id="coin-value">0</span>
+                </div>
+                <div class="grid-item">
+                    <img src="assets/sprites/coin1.png" alt="Coins" class="icon"></img>
+                    <span class="stat-label"></span> <span id="kills-value">0</span>
+                </div>
+            </div>
+            <p id="info"></p>                
+            </div>
+        <button id="start-button">Start Game</button>
+    </div>
+    <div class="split right">
+        <canvas id="gameCanvas" width="650" height="650"></canvas>
+        <img id="jolle" src="assets/sprites/jolle.png" style="display:none;"></img>
+        <img id="enemyJolle" src="assets/sprites/enemyJolle.png" style="display:none;"></img>
+        <img id="cannon" src="assets/sprites/cannon.png" style="display:none;"></img>
+        <img id="missile" src="assets/sprites/missile.png" style="display:none;"></img>
+        <img id="destroyer" src="assets/sprites/destroyer.png" style="display:none;"></img>
+        <img id="coin1" src="assets/sprites/coin1.png" style="display:none;"></img>
+    </div>
     <script type="module" src="game.js"></script>
-    <p id="info"></p>
-    <p id="stats"></p>
 </body>
 
 </html>

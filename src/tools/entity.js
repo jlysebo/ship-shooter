@@ -10,6 +10,7 @@ export class Entity {
             this.width = width;
         this.height = height;
         this.hitPoints = hitPoints;
+        this.lastUpdate = null;
     }
 
     alive() {
@@ -30,15 +31,29 @@ export class Entity {
          * @returns next X.
          */
     nextX() {
-        return this.x + Math.cos(this.angle) * this.speed;
+        let tempDate = new Date();
+        if (this.lastUpdate == null) {
+            return this.x;
+        }
+        else {
+            let millis = tempDate - this.lastUpdate;
+            return this.x + Math.cos(this.angle) * this.speed * (millis)/17;
+        }
     }
-
+    
     /**
      * Calculates next Y position.
      * @returns next Y.
-     */
-    nextY() {
-        return this.y + Math.sin(this.angle) * this.speed;
+    */
+   nextY() {
+        let tempDate = new Date();
+        if (this.lastUpdate == null) {
+            return this.y;
+        }
+        else {
+            let millis = tempDate - this.lastUpdate;
+            return this.y + Math.sin(this.angle) * this.speed * (millis)/17;
+        }
     }
 
     /**
@@ -97,5 +112,9 @@ export class Entity {
 
     adjustAngle(entity) {
         this.angle = calculateAngle(this.x, this.y, entity.x, entity.y);
+    }
+
+    update() {
+        this.lastUpdate = new Date();
     }
 }
