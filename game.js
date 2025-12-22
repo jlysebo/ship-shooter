@@ -125,9 +125,12 @@ function gameLoop() {
     updateCoins();
     drawCanvas();
 
+    healthLabel.textContent = game.player.hitPoints;
+    coinsLabel.textContent = game.stats.coins;
+    ammoLabel.textContent = game.player.weapon.ammo;
+    killsLabel.textContent = game.stats.kills;
 
     info.textContent = "X: " + Math.round(game.player.x) + ", Y: " + Math.round(game.player.y) + ", Angle: " + Math.round(game.player.angle / Math.PI * 180) + "\nshotAngle: " + Math.round(game.player.shotAngle / Math.PI * 180) + " Ammo: " + game.player.weapon.ammo;
-    statsLabel.textContent = "Lives: " + game.player.hitPoints + ", Kills: " + game.stats.kills + "Shots: " + game.stats.shots + ", Coins: " + game.stats.coins;
 
     //queues next framew
     if (game.player.hitPoints < 1 || keys.p) {
@@ -157,9 +160,12 @@ const coin1Img = document.getElementById(Settings.img.coin_1);
 
 
 const info = document.getElementById("info");
-const statsLabel = document.getElementById("stats");
 const statsContainer = document.getElementById('stats-container');
-const startButton = document.getElementById("start-button")
+const startButton = document.getElementById("start-button");
+const ammoLabel = document.getElementById("ammo-value");
+const healthLabel = document.getElementById("health-value");
+const killsLabel = document.getElementById("kills-value");
+const coinsLabel = document.getElementById("coin-value");
 var startButtonValid = true;
 
 
@@ -167,6 +173,9 @@ var startButtonValid = true;
 
 function startGame() {
     const stats = new gameStats();
+    document.getElementById('upgrade-container').style.visibility = "visible";
+    document.getElementById('info-container').style.visibility = "visible";
+    document.getElementById('how-to-play').textContent = "";
     game = {
         stats: stats,
         player: new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats),
@@ -178,6 +187,7 @@ function startGame() {
     game.player.weapon.upgradable.forEach(item => {
         game.statsDisplay.push(new statElement(item));
     });
+    game.statsDisplay.push(new statElement(game.player.speed));
     statsContainer.innerHTML = "";
     game.statsDisplay.forEach(stat => statsContainer.appendChild(stat.render()));
     console.log("started");

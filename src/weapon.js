@@ -3,11 +3,11 @@ import { Upgradable } from "./tools/upgradable.js";
 
 export class Weapon {
     constructor(shotDelay, capacity, reloadDelay, stats) {
-        this.shotDelay = new Upgradable("Shot Delay", shotDelay, -5, 40, 20, 20, stats);
-        this.capacity = new Upgradable("Ammo Capacity", capacity, 10, 20, 1, 1000, stats);
-        this.reloadDelay = new Upgradable("Reload Delay", reloadDelay, -5, 40, 20, 20, stats);
+        this.shotDelay = new Upgradable("Shot Delay", shotDelay, -50, 10, 0, 12, stats);
+        this.capacity = new Upgradable("Ammo Capacity", capacity, 20, 5, 1, 1000, stats);
+        this.reloadDelay = new Upgradable("Reload Delay", reloadDelay, -50, 5, 1, 10, stats);
         this.stats = stats;
-        this.bulletSpeed = new Upgradable("Bullet Speed", 10, 0.5, 50, 50, 10, stats);
+        this.bulletSpeed = new Upgradable("Bullet Speed", 10, 0.5, 10, 5, 10, stats);
         this.ammo = capacity;
         this.reloadAmount = 1;
         this.bullets = [];
