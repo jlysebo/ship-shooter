@@ -9,6 +9,7 @@ import { Destroyer } from "./src/destroyer.js";
 import { gameStats } from "./src/gameStats.js";
 import { Coin } from "./src/coin.js";
 import { statElement } from "./src/tools/statElement.js";
+import { Submarine } from "./src/submarine.js";
 
 let game = {};
 
@@ -28,7 +29,23 @@ function drawCanvas() {
             drawRotatedImage(destroyerImg, enemy.x, enemy.y, enemy.angle);
             enemy.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
         }
+        if (enemy instanceof Submarine) {
+            if (enemy.underwater) {
+                drawRotatedImage(submarineUnderwaterImg, enemy.x, enemy.y, enemy.angle);
+            }
+            else {
+                drawRotatedImage(submarineImg, enemy.x, enemy.y, enemy.angle);
+            }
+        }
     });
+    game.mines.forEach(mine => {
+        if (mine.detonating) {
+            drawRotatedImage(explosion75Img, mine.x, mine.y, mine.angle);
+        }
+        else {
+            drawRotatedImage(mineImg, mine.x, mine.y, mine.angle);
+        }
+    })
 }
 
 /**
@@ -40,6 +57,9 @@ function spawnEnemy(buffer) {
     let xy = randomXY();
     while (distance(game.player.x, game.player.y, xy[0], xy[1]) < buffer) {
         xy = randomXY();
+    }
+    if (dice == 5) {
+        game.enemies.push(new Submarine(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), 25, 80, 3, randomInteger(4000, 5000), randomInteger(0, 4)));
     }
     if (dice == 6) {
         game.enemies.push(new Destroyer(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), 35, 85, 1, randomInteger(280, 450), randomInteger(2000, 3000)));
@@ -65,11 +85,23 @@ function updateEnemies() {
         // updates hitpoints for all player bullets.
         game.player.weapon.bullets.forEach(bullet => {
             if (enemy.contact(bullet)) {
-                enemy.hitPoints -= 1;
-                bullet.hitPoints -= 1;
-                if (enemy.hitPoints < 1) {
-                    game.stats.registerKill();
-                    game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+                if (enemy instanceof Submarine) {
+                    if (!enemy.underwater) {
+                        enemy.hitPoints -= 1;
+                        bullet.hitPoints -= 1;
+                        if (enemy.hitPoints < 1) {
+                            game.stats.registerKill();
+                            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+                        }
+                    }
+                }
+                else {
+                    enemy.hitPoints -= 1;
+                    bullet.hitPoints -= 1;
+                    if (enemy.hitPoints < 1) {
+                        game.stats.registerKill();
+                        game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+                    }
                 }
             }
         })
@@ -77,6 +109,12 @@ function updateEnemies() {
         if (game.player.contact(enemy)) {
             game.player.takeDamage();
         }
+        if (enemy instanceof Submarine) {
+            while (enemy.mines.length > 0) {
+                game.mines.push(enemy.mines.pop());
+            }
+        }
+
         // If enemy is a Destroyer, loop through all its bullets.
         if (enemy instanceof Destroyer) {
             enemy.bullets.forEach(bullet => {
@@ -102,6 +140,21 @@ function updateEnemies() {
             })
         }
     });
+    // mine hits player
+    const tempDate = new Date();
+    game.mines.forEach(mine => {
+        mine.update(tempDate);
+        if (mine.contact(game.player)) {
+            game.player.takeDamage();
+            mine.detonate();
+        }
+        game.player.weapon.bullets.forEach(bullet => {
+            if (bullet.contact(mine)) {
+                mine.detonate();
+                bullet.hitPoints -= 1;
+            }
+        })
+    });
     if (game.enemies.length == 0) {
         for (let i = 0; i <= game.stats.level; i++) {
             spawnEnemy(250);
@@ -109,6 +162,7 @@ function updateEnemies() {
         game.stats.level += 0.3;
     }
     game.enemies = game.enemies.filter(enemy => enemy.hitPoints > 0);
+    game.mines = game.mines.filter(mine => mine.hitPoints > 0);
 }
 
 function displayEndscreen() {
@@ -154,6 +208,10 @@ const bulletImg = document.getElementById(Settings.img.bullet);
 const enemy1Img = document.getElementById(Settings.img.enemy1);
 const destroyerImg = document.getElementById(Settings.img.destroyer);
 const coin1Img = document.getElementById(Settings.img.coin_1);
+const submarineImg = document.getElementById(Settings.img.submarine);
+const submarineUnderwaterImg = document.getElementById(Settings.img.submarineUnderwater);
+const mineImg = document.getElementById(Settings.img.mine);
+const explosion75Img = document.getElementById(Settings.img.explosion75);
 
 
 
@@ -181,7 +239,7 @@ function startGame() {
         player: new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats),
         statsDisplay: [],
         enemies: [],
-
+        mines: [],
     }
     game.statsDisplay.length = 0;
     game.player.weapon.upgradable.forEach(item => {

@@ -37,22 +37,22 @@ export class Entity {
         }
         else {
             let millis = tempDate - this.lastUpdate;
-            return this.x + Math.cos(this.angle) * this.speed * (millis)/17;
+            return this.x + Math.cos(this.angle) * this.speed * (millis) / 17;
         }
     }
-    
+
     /**
      * Calculates next Y position.
      * @returns next Y.
     */
-   nextY() {
+    nextY() {
         let tempDate = new Date();
         if (this.lastUpdate == null) {
             return this.y;
         }
         else {
             let millis = tempDate - this.lastUpdate;
-            return this.y + Math.sin(this.angle) * this.speed * (millis)/17;
+            return this.y + Math.sin(this.angle) * this.speed * (millis) / 17;
         }
     }
 
