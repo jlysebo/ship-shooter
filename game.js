@@ -39,10 +39,13 @@ function drawCanvas() {
         }
     });
     game.mines.forEach(mine => {
-        if (mine.detonating) {
+        if (mine.detonationStage >= 2) {
             drawRotatedImage(explosion75Img, mine.x, mine.y, mine.angle);
         }
-        else {
+        else if (mine.detonationStage == 1) {
+            drawRotatedImage(mineRedImg, mine.x, mine.y, mine.angle);
+        }
+        else if (mine.detonationStage == 0) {
             drawRotatedImage(mineImg, mine.x, mine.y, mine.angle);
         }
     })
@@ -79,9 +82,28 @@ function updateCoins() {
 }
 
 function updateEnemies() {
-    // add new enemies
+    // mine hits player
+    const tempDate = new Date();
+    game.mines.forEach(mine => {
+        mine.update(tempDate, game.mines);
+        if (mine.contact(game.player)) {
+            game.player.takeDamage();
+            mine.detonate(game.mines);
+        }
+        game.player.weapon.bullets.forEach(bullet => {
+            if (bullet.contact(mine) && (mine.detonationStage < 2)) {
+                mine.detonate(game.mines);
+                bullet.hitPoints -= 1;
+            }
+        })
+    });
     game.enemies.forEach(enemy => {
         enemy.update(game.player);
+        game.mines.forEach(mine => {
+            if (mine.detonationStage == 2 && mine.contact(enemy)) {
+                enemy.hitPoints -= 1;
+            }
+        })
         // updates hitpoints for all player bullets.
         game.player.weapon.bullets.forEach(bullet => {
             if (enemy.contact(bullet)) {
@@ -140,21 +162,6 @@ function updateEnemies() {
             })
         }
     });
-    // mine hits player
-    const tempDate = new Date();
-    game.mines.forEach(mine => {
-        mine.update(tempDate);
-        if (mine.contact(game.player)) {
-            game.player.takeDamage();
-            mine.detonate();
-        }
-        game.player.weapon.bullets.forEach(bullet => {
-            if (bullet.contact(mine)) {
-                mine.detonate();
-                bullet.hitPoints -= 1;
-            }
-        })
-    });
     if (game.enemies.length == 0) {
         for (let i = 0; i <= game.stats.level; i++) {
             spawnEnemy(250);
@@ -211,6 +218,7 @@ const coin1Img = document.getElementById(Settings.img.coin_1);
 const submarineImg = document.getElementById(Settings.img.submarine);
 const submarineUnderwaterImg = document.getElementById(Settings.img.submarineUnderwater);
 const mineImg = document.getElementById(Settings.img.mine);
+const mineRedImg = document.getElementById(Settings.img.mineRed);
 const explosion75Img = document.getElementById(Settings.img.explosion75);
 
 

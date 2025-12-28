@@ -20,7 +20,9 @@ export const Settings = {
         submarine: "submarine",
         submarineUnderwater: "submarine_underwater",
         mine: "mine",
+        mineRed: "mine_red",
         explosion75: "explosion75",
+
     }
 }
 

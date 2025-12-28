@@ -6,27 +6,34 @@ export class Mine extends Entity {
         this.detonateRadius = detonateRadius;
         this.detonationTime = detonationTime;
         this.creationTime = new Date();
-        this.detonating = false;
+        this.detonationStage = 0;
 
     }
 
-    detonate() {
+    detonate(mineList) {
         this.width = this.detonateRadius;
         this.height = this.detonateRadius;
-        this.detonating = true;
+        this.detonationStage = 2;
         this.detonationTime = new Date();
+        mineList.forEach(mine => {
+            if (this.contact(mine) && !(mine.detonationStage == 2)) {
+                mine.detonate(mineList);
+            }
+        });
     }
 
-    update(tempDate) {
-        if (this.detonating) {
-            if (this.detonationTime < tempDate - 1000) {
+    update(tempDate, mineList) {
+        if (this.detonationStage >= 2) {
+            this.detonationStage = 3;
+            if (tempDate - this.detonationTime > 500) {
                 this.hitPoints = 0;
             }
         }
-        else {
-            if (this.detonationTime < tempDate - this.creationTime) {
-                this.detonate();
+        else if (this.detonationTime < tempDate - this.creationTime) {
+                this.detonate(mineList);
             }
+        else if (this.detonationTime - 2500 < tempDate - this.creationTime) {
+            this.detonationStage = 1;
         }
     }
 }

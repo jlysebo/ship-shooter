@@ -19,8 +19,9 @@ export class Submarine extends Enemy {
         if (this.alive) {
             const tempDate = new Date();
             if (this.lastMineDrop < tempDate - this.reloadTime) {
-                this.mines.push(new Mine(this.x, this.y, 0, 0, 25, 25, 1, randomInteger(40, 60), randomInteger(30000, 45000)));
+                this.mines.push(new Mine(this.x, this.y, 0, 0, 25, 25, 1, 75, randomInteger(30000, 45000)));
                 this.lastMineDrop = tempDate;
+                this.reloadTime = randomInteger(3000, 5000);
             }
             if (tempDate < this.lastMineDrop + this.surfacetime / 2 || this.lastMineDrop > tempDate - this.surfacetime / 2) {
                 this.underwater = false;

@@ -1,6 +1,7 @@
 import { Bullet } from "./bullet.js";
 import { Enemy } from "./enemy.js";
 import { distance } from "./tools/calculations.js";
+import { randomInteger } from "./tools/random.js";
 
 export class Destroyer extends Enemy {
     constructor(x, y, angle, speed, width, height, hitPoints, range, reloadTime) {
@@ -22,6 +23,7 @@ export class Destroyer extends Enemy {
             this.adjustAngle(player);
             this.bullets.push(new Bullet(this.x, this.y, this.angle, 10, 11, 11, 1))
             this.lastShotTime = tempDate;
+            this.reloadTime = randomInteger(1500, 3000);
         }
         else {
             this.lastUpdate = tempDate;
