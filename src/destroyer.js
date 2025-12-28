@@ -5,7 +5,7 @@ import { randomInteger } from "./tools/random.js";
 
 export class Destroyer extends Enemy {
     constructor(x, y, angle, speed, width, height, hitPoints, range, reloadTime) {
-        super(x, y, angle, speed, width, height, hitPoints);
+        super(x, y, angle, speed, width, height, hitPoints, 0);
         this.range = range;
         this.reloadTime = reloadTime;
         this.bullets = [];

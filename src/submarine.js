@@ -5,7 +5,7 @@ import { randomInteger } from "./tools/random.js";
 
 export class Submarine extends Enemy {
     constructor(x, y, angle, speed, width, height, hitPoints, reloadTime, direction) {
-        super(x, y, angle, speed, width, height, hitPoints);
+        super(x, y, angle, speed, width, height, hitPoints, 0);
         this.reloadTime = reloadTime;
         this.direction = direction;
         this.lastMineDrop = new Date();
