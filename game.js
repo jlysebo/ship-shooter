@@ -18,7 +18,12 @@ function drawCanvas() {
     drawRotatedImage(playerImg, game.player.x, game.player.y, game.player.angle);
     drawRotatedImage(cannonImg, game.player.x, game.player.y, game.player.shotAngle);
     game.stats.coinList.forEach(coin => {
-        drawRotatedImage(coin1Img, coin.x, coin.y, 0);
+        if (coin.value == 1) {
+            drawRotatedImage(coin1Img, coin.x, coin.y, 0);
+        }
+        else if (coin.value == 5) {
+            drawRotatedImage(coin5Img, coin.x, coin.y, 0);
+        }
     })
     game.player.weapon.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
     game.enemies.forEach(enemy => {
@@ -65,7 +70,7 @@ function spawnEnemy(buffer) {
         game.enemies.push(new Submarine(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), 25, 80, 3, randomInteger(4000, 5000), randomInteger(0, 4)));
     }
     if (dice == 6) {
-        game.enemies.push(new Destroyer(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), 35, 85, 1, randomInteger(280, 450), randomInteger(2000, 3000)));
+        game.enemies.push(new Destroyer(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), 35, 85, 2, randomInteger(280, 450), randomInteger(2000, 3000)));
     }
     else {
         game.enemies.push(new rib(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.3, Math.max(2.4, game.stats.level * 0.4)), enemy1Img.width, enemy1Img.height, 1, randomDecimal(-Math.PI/8, Math.PI/8)));
@@ -86,7 +91,7 @@ function updateEnemies() {
     const tempDate = new Date();
     game.mines.forEach(mine => {
         mine.update(tempDate, game.mines);
-        if (mine.contact(game.player)) {
+        if (mine.contact(game.player) && mine.detonationStage <=2) {
             game.player.takeDamage();
             mine.detonate(game.mines);
         }
@@ -97,11 +102,24 @@ function updateEnemies() {
             }
         })
     });
+    // mine kills enemy
     game.enemies.forEach(enemy => {
         enemy.update(game.player);
         game.mines.forEach(mine => {
             if (mine.detonationStage == 2 && mine.contact(enemy)) {
-                enemy.hitPoints -= 1;
+                enemy.hitPoints -= 5;
+                if (enemy.hitPoints <= 0) {
+                    game.stats.registerKill();
+                    if (enemy instanceof rib) {
+                        game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+                    }
+                    else if (enemy instanceof Destroyer) {
+                        game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+                    }
+                    else if (enemy instanceof Submarine) {
+                        game.stats.coinList.push(new Coin(enemy.x, enemy.y, 5));
+                    }
+                }
             }
         })
         // updates hitpoints for all player bullets.
@@ -113,7 +131,7 @@ function updateEnemies() {
                         bullet.hitPoints -= 1;
                         if (enemy.hitPoints < 1) {
                             game.stats.registerKill();
-                            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+                            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 5));
                         }
                     }
                 }
@@ -129,7 +147,9 @@ function updateEnemies() {
         })
         // player takes damage.
         if (game.player.contact(enemy)) {
-            game.player.takeDamage();
+            if (!(enemy instanceof Submarine && enemy.underwater)) {
+                game.player.takeDamage();
+            }
         }
         if (enemy instanceof Submarine) {
             while (enemy.mines.length > 0) {
@@ -173,6 +193,7 @@ function updateEnemies() {
 }
 
 function displayEndscreen() {
+    continueButton.style.visibility = "visible";
     ctx.font = "50px Arial";
     ctx.fillText("GAME OVER", 150, 300);
     startButtonValid = true;
@@ -215,11 +236,14 @@ const bulletImg = document.getElementById(Settings.img.bullet);
 const enemy1Img = document.getElementById(Settings.img.enemy1);
 const destroyerImg = document.getElementById(Settings.img.destroyer);
 const coin1Img = document.getElementById(Settings.img.coin_1);
+const coin5Img = document.getElementById(Settings.img.coin_5);
 const submarineImg = document.getElementById(Settings.img.submarine);
 const submarineUnderwaterImg = document.getElementById(Settings.img.submarineUnderwater);
 const mineImg = document.getElementById(Settings.img.mine);
 const mineRedImg = document.getElementById(Settings.img.mineRed);
 const explosion75Img = document.getElementById(Settings.img.explosion75);
+const heartImg = document.getElementById(Settings.img.heart);
+const skullImg = document.getElementById(Settings.img.skull);
 
 
 
@@ -228,6 +252,7 @@ const explosion75Img = document.getElementById(Settings.img.explosion75);
 const info = document.getElementById("info");
 const statsContainer = document.getElementById('stats-container');
 const startButton = document.getElementById("start-button");
+const continueButton = document.getElementById("continue-button");
 const ammoLabel = document.getElementById("ammo-value");
 const healthLabel = document.getElementById("health-value");
 const killsLabel = document.getElementById("kills-value");
@@ -236,12 +261,22 @@ var startButtonValid = true;
 
 
 
+// continue with same player, but new game
+function continueGame() {
+    game.player.hitPoints = 3;
+    game.player.weapon.ammo = game.player.weapon.capacity.value;
+    game.enemies.length = 0;
+    game.mines.length = 0;
+    game.stats.coinList.length = 0;
+    game.stats.level = 1;
+    setupInput();
+    gameLoop();
+}
 
+
+// create new player and game
 function startGame() {
     const stats = new gameStats();
-    document.getElementById('upgrade-container').style.visibility = "visible";
-    document.getElementById('info-container').style.visibility = "visible";
-    document.getElementById('how-to-play').textContent = "";
     game = {
         stats: stats,
         player: new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats),
@@ -254,6 +289,9 @@ function startGame() {
         game.statsDisplay.push(new statElement(item));
     });
     game.statsDisplay.push(new statElement(game.player.speed));
+    document.getElementById('upgrade-container').style.visibility = "visible";
+    document.getElementById('info-container').style.visibility = "visible";
+    document.getElementById('how-to-play').textContent = "";
     statsContainer.innerHTML = "";
     game.statsDisplay.forEach(stat => statsContainer.appendChild(stat.render()));
     console.log("started");
@@ -265,6 +303,13 @@ function startGame() {
 startButton.addEventListener('click', () => {
     if (startButtonValid) {
         startGame();
+        startButtonValid = false;
+    }
+})
+
+continueButton.addEventListener('click', () => {
+    if (startButtonValid) {
+        continueGame();
         startButtonValid = false;
     }
 })

@@ -17,12 +17,14 @@ export const Settings = {
         enemy1: "enemyJolle",
         destroyer: "destroyer",
         coin_1: "coin1",
+        coin_5: "coin5",
         submarine: "submarine",
         submarineUnderwater: "submarine_underwater",
         mine: "mine",
         mineRed: "mine_red",
         explosion75: "explosion75",
-
+        heart: "heart",
+        skull: "skull",
     }
 }
 

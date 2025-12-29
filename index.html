@@ -35,7 +35,7 @@
             </div>
             <div class="grid-container">
                 <div class="grid-item">
-                    <img src="assets/sprites/coin1.png" alt="Coins" class="icon"></img>
+                    <img src="assets/sprites/heart.png" alt="Health" class="icon"></img>
                     <span class="stat-label"></span> <span id="health-value">0</span>
                 </div>
                 <div class="grid-item">
@@ -47,13 +47,14 @@
                     <span class="stat-label"></span> <span id="coin-value">0</span>
                 </div>
                 <div class="grid-item">
-                    <img src="assets/sprites/coin1.png" alt="Coins" class="icon"></img>
+                    <img src="assets/sprites/skull.png" alt="Kills" class="icon"></img>
                     <span class="stat-label"></span> <span id="kills-value">0</span>
                 </div>
             </div>
             <p id="info"></p>                
             </div>
-        <button id="start-button">Start Game</button>
+        <button id="start-button">Start New Game</button>
+        <button id="continue-button" style="visibility: hidden;">Continue Game</button>
     </div>
     <div class="split right">
         <canvas id="gameCanvas" width="650" height="650"></canvas>
@@ -63,11 +64,14 @@
         <img id="missile" src="assets/sprites/missile.png" style="display:none;"></img>
         <img id="destroyer" src="assets/sprites/destroyer.png" style="display:none;"></img>
         <img id="coin1" src="assets/sprites/coin1.png" style="display:none;"></img>
+        <img id="coin5" src="assets/sprites/coin5.png" style="display:none;"></img>
         <img id="submarine" src="assets/sprites/submarine.png" style="display:none;"></img>
         <img id="submarine_underwater" src="assets/sprites/submarine_underwater.png" style="display:none;"></img>
         <img id="mine" src="assets/sprites/mine.png" style="display:none;"></img>
         <img id="mine_red" src="assets/sprites/mine_red.png" style="display:none;"></img>
-        <img id ="explosion75" src="assets/sprites/explosion75.png" style="display:none;"></img>
+        <img id="explosion75" src="assets/sprites/explosion75.png" style="display:none;"></img>
+        <img id="heart" src="assets/sprites/heart.png" style="display:none;"></img>
+        <img id="skull" src="assets/sprites/skull.png" style="display:none;"></img>
     </div>
     <script type="module" src="game.js"></script>
 </body>
