@@ -37,36 +37,39 @@
             <div class="grid-container">
                 <div class="grid-item">
                     <img src="assets/sprites/heart.png" alt="Health" class="icon"></img>
-                    <span class="stat-label"></span> <span id="health-value">0</span>
+                    <span id="health-value">0</span>
                 </div>
                 <div class="grid-item">
                     <img src="assets/sprites/missile.png" alt="Missile" class="icon"></img>
-                    <span class="stat-label"></span> <span id="ammo-value">0</span>
+                    <span id="ammo-value">0</span>
                 </div>
                 <div class="grid-item">
                     <img src="assets/sprites/coin1.png" alt="Coins" class="icon"></img>
-                    <span class="stat-label"></span> <span id="coin-value">0</span>
+                    <span id="coin-value">0</span>
                 </div>
                 <div class="grid-item">
                     <img src="assets/sprites/skull.png" alt="Kills" class="icon"></img>
-                    <span class="stat-label"></span> <span id="kills-value">0</span>
+                    <span id="kills-value">0</span>
                 </div>
                 <div class="grid-item">
                     <img src="assets/sprites/shield.png" alt="Ability" class="icon"></img>
-                    <span class="stat-label"></span> <span id="ability-status">Ready</span>
+                    <span id="ability-status">Ready</span>
                 </div>
                 <div class="grid-item">
                     <img src="assets/sprites/cannon.png" alt="Weapon" class="icon"></img>
-                    <span class="stat-label"></span> <span id="weapon-status">Cannon</span>
+                    <span id="weapon-status">Cannon</span>
                 </div>
             </div>
-            <p id="info"></p>                
-            </div>
-        <button id="start-button">Start New Game</button>
-        <button id="continue-button" style="visibility: hidden;">Continue Game</button>
+            <p id="info"></p>
+        </div>
+
     </div>
     <div class="split right">
         <canvas id="gameCanvas" width="650" height="650"></canvas>
+        <div class="button-container" id="button-container">
+            <button id="start-button">Start New Game</button>
+            <button id="continue-button" style="visibility: hidden;">Continue Game</button>
+        </div>
         <img id="jolle" src="assets/sprites/jolle.png" style="display:none;"></img>
         <img id="enemyJolle" src="assets/sprites/enemyJolle.png" style="display:none;"></img>
         <img id="cannon" src="assets/sprites/cannon.png" style="display:none;"></img>

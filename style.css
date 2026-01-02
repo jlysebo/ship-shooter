@@ -9,7 +9,7 @@
   position: fixed;
   top: 0;
   overflow-x: hidden;
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 .left {
@@ -73,7 +73,7 @@
 
 #start-button {
   display: block;
-  margin: 20px auto;
+  margin: 10px auto;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -81,7 +81,7 @@
 
 #continue-button {
   display: block;
-  margin: 20px auto;
+  margin: 10px auto;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -100,15 +100,20 @@
   justify-content: center;
   /* centers vertically */
   text-align: center;
-  padding: 20px;
-  width: 50%;
+  padding: 5px;
+  width: 100%;
 }
 
 .grid-item img {
-  width: 30px;
+  width: 100%;
   /* force consistent size */
   height: 30px;
   object-fit: contain;
   /* keeps aspect ratio without cropping */
   margin-bottom: 10px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
 }

@@ -1,6 +1,6 @@
 import { Player } from "./src/player.js";
 import { keys, setupInput } from "./src/input.js";
-import settings, { Settings } from "./src/settings.js";
+import { Settings } from "./src/settings.js";
 import { drawRotatedImage } from "./src/tools/drawRotatedImage.js";
 import { rib } from "./src/rib.js";
 import { randomDecimal, randomInteger, randomXY } from "./src/tools/random.js";
@@ -80,18 +80,23 @@ function drawCanvas() {
     })
     if (game.player.ability instanceof ShieldAbility) {
         const tempDate = new Date();
-        if (game.player.ability.active) {
-            abilityLabel.textContent = "Active";
-            //ctx.beginPath();
-            //ctx.arc(game.player.x, game.player.y, game.player.ability.range, 0, 2 * Math.PI);
-            //ctx.stroke();
-            drawRotatedImage(shieldImg, game.player.x, game.player.y, game.player.angle);
-        }
-        else if (tempDate - game.player.ability.lastActivationTime > game.player.ability.cooldown + game.player.ability.duration) {
-            abilityLabel.textContent = "Ready";
+        if (game.player.ability.available.value) {
+            if (game.player.ability.active) {
+                abilityLabel.textContent = "Active";
+                //ctx.beginPath();
+                //ctx.arc(game.player.x, game.player.y, game.player.ability.range, 0, 2 * Math.PI);
+                //ctx.stroke();
+                drawRotatedImage(shieldImg, game.player.x, game.player.y, game.player.angle);
+            }
+            else if (tempDate - game.player.ability.lastActivationTime > game.player.ability.cooldown + game.player.ability.duration) {
+                abilityLabel.textContent = "Ready";
+            }
+            else {
+                abilityLabel.textContent = "Cooldown";
+            }
         }
         else {
-            abilityLabel.textContent = "Cooldown";
+            abilityLabel.textContent = "Not Bought";
         }
     }
 }
@@ -264,6 +269,7 @@ function displayEndscreen() {
     ctx.fillStyle = "black";
     ctx.fillText("GAME OVER", 170, 330);
     startButtonValid = true;
+    document.getElementById('button-container').style.display = "flex";
 }
 
 function gameLoop() {
@@ -379,6 +385,7 @@ startButton.addEventListener('click', () => {
     if (startButtonValid) {
         startButtonValid = false;
         startButton.blur();
+        document.getElementById('button-container').style.display = "none";
         startGame();
     }
 })
@@ -387,6 +394,7 @@ continueButton.addEventListener('click', () => {
     if (startButtonValid) {
         startButtonValid = false;
         continueButton.blur();
+        document.getElementById('button-container').style.display = "none";
         continueGame();
     }
 })
