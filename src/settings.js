@@ -27,6 +27,9 @@ export const Settings = {
         skull: "skull",
         shield: "shield",
         multishot: "multishot",
+        seashore_side: "seashore_side",
+        seashore_corner: "seashore_corner",
+        sea_middle: "sea_middle",
     }
 }
 

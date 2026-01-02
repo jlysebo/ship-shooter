@@ -1,6 +1,6 @@
 import { Player } from "./src/player.js";
 import { keys, setupInput } from "./src/input.js";
-import { Settings } from "./src/settings.js";
+import settings, { Settings } from "./src/settings.js";
 import { drawRotatedImage } from "./src/tools/drawRotatedImage.js";
 import { rib } from "./src/rib.js";
 import { randomDecimal, randomInteger, randomXY } from "./src/tools/random.js";
@@ -19,6 +19,18 @@ let game = {};
 
 function drawCanvas() {
     ctx.clearRect(0, 0, Settings.window.width, Settings.window.height);
+    ctx.drawImage(sea_middleImg, 0, 0, 650, 650);
+    ctx.fillStyle = "#33CCCC";
+    drawRotatedImage(seashore_cornerImg, 25, 25, 0);
+    drawRotatedImage(seashore_cornerImg, Settings.window.width - 25, 25, Math.PI / 2);
+    drawRotatedImage(seashore_cornerImg, 25, Settings.window.height - 25, 3 * Math.PI / 2);
+    drawRotatedImage(seashore_cornerImg, Settings.window.width - 25, Settings.window.height - 25, Math.PI);
+    for (let i = 75; i < Settings.window.width - 25; i += 50) {
+        drawRotatedImage(seashore_sideImg, 25, i, 0);
+        drawRotatedImage(seashore_sideImg, Settings.window.width - 25, i, Math.PI);
+        drawRotatedImage(seashore_sideImg, i, 25, Math.PI / 2);
+        drawRotatedImage(seashore_sideImg, i, Settings.window.height - 25, 3 * Math.PI/2);
+    }
     drawRotatedImage(playerImg, game.player.x, game.player.y, game.player.angle);
     drawRotatedImage(cannonImg, game.player.x, game.player.y, game.player.shotAngle);
     game.stats.itemList.forEach(item => {
@@ -128,7 +140,7 @@ function damageEnemy(enemy, damage) {
     enemy.hitPoints -= damage;
     if (enemy.hitPoints <= 0) {
         game.stats.registerKill();
-        const number = randomInteger(0,1000); 
+        const number = randomInteger(0, 1000);
         if (number > 985) {
             game.stats.itemList.push(new Heart(enemy.x, enemy.y, 1));
         }
@@ -249,7 +261,8 @@ function updateEnemies() {
 function displayEndscreen() {
     continueButton.style.visibility = "visible";
     ctx.font = "50px Arial";
-    ctx.fillText("GAME OVER", 150, 300);
+    ctx.fillStyle = "black";
+    ctx.fillText("GAME OVER", 170, 330);
     startButtonValid = true;
 }
 
@@ -302,7 +315,9 @@ const heartImg = document.getElementById(Settings.img.heart);
 const skullImg = document.getElementById(Settings.img.skull);
 const shieldImg = document.getElementById(Settings.img.shield);
 const multishotImg = document.getElementById(Settings.img.multishot);
-
+const seashore_cornerImg = document.getElementById(Settings.img.seashore_corner);
+const seashore_sideImg = document.getElementById(Settings.img.seashore_side);
+const sea_middleImg = document.getElementById(Settings.img.sea_middle);
 
 
 
@@ -362,15 +377,17 @@ function startGame() {
 //initialize input listeners
 startButton.addEventListener('click', () => {
     if (startButtonValid) {
-        startGame();
         startButtonValid = false;
+        startButton.blur();
+        startGame();
     }
 })
 
 continueButton.addEventListener('click', () => {
     if (startButtonValid) {
-        continueGame();
         startButtonValid = false;
+        continueButton.blur();
+        continueGame();
     }
 })
 //starts first loop
