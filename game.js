@@ -10,6 +10,7 @@ import { gameStats } from "./src/gameStats.js";
 import { Coin } from "./src/coin.js";
 import { statElement } from "./src/tools/statElement.js";
 import { Submarine } from "./src/submarine.js";
+import { ShieldAbility } from "./src/shield.js";
 
 let game = {};
 
@@ -54,6 +55,22 @@ function drawCanvas() {
             drawRotatedImage(mineImg, mine.x, mine.y, mine.angle);
         }
     })
+    if (game.player.ability instanceof ShieldAbility) {
+        const tempDate = new Date();
+        if (game.player.ability.active) {
+            abilityLabel.textContent = "Active";
+            //ctx.beginPath();
+            //ctx.arc(game.player.x, game.player.y, game.player.ability.range, 0, 2 * Math.PI);
+            //ctx.stroke();
+            drawRotatedImage(shieldImg, game.player.x, game.player.y, game.player.angle);
+        }
+        else if (tempDate - game.player.ability.lastActivationTime > game.player.ability.cooldown + game.player.ability.duration) {
+            abilityLabel.textContent = "Ready";
+        }
+        else {
+            abilityLabel.textContent = "Cooldown";
+        }
+    }
 }
 
 /**
@@ -73,7 +90,7 @@ function spawnEnemy(buffer) {
         game.enemies.push(new Destroyer(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), 35, 85, 2, randomInteger(280, 450), randomInteger(2000, 3000)));
     }
     else {
-        game.enemies.push(new rib(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.3, Math.max(2.4, game.stats.level * 0.4)), enemy1Img.width, enemy1Img.height, 1, randomDecimal(-Math.PI/8, Math.PI/8)));
+        game.enemies.push(new rib(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.3, Math.max(2.4, game.stats.level * 0.4)), enemy1Img.width, enemy1Img.height, 1, randomDecimal(-Math.PI / 8, Math.PI / 8)));
     }
 }
 
@@ -86,12 +103,28 @@ function updateCoins() {
     game.stats.refreshCoinList();
 }
 
+function damageEnemy(enemy, damage) {
+    enemy.hitPoints -= damage;
+    if (enemy.hitPoints <= 0) {
+        game.stats.registerKill();
+        if (enemy instanceof rib) {
+            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+        }
+        else if (enemy instanceof Destroyer) {
+            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+        }
+        else if (enemy instanceof Submarine) {
+            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 5));
+        }
+    }
+}
+
 function updateEnemies() {
     // mine hits player
     const tempDate = new Date();
     game.mines.forEach(mine => {
         mine.update(tempDate, game.mines);
-        if (mine.contact(game.player) && mine.detonationStage <=2) {
+        if (mine.contact(game.player) && mine.detonationStage <= 2) {
             game.player.takeDamage();
             mine.detonate(game.mines);
         }
@@ -105,21 +138,14 @@ function updateEnemies() {
     // mine kills enemy
     game.enemies.forEach(enemy => {
         enemy.update(game.player);
+        if (game.player.ability instanceof ShieldAbility && game.player.ability.active) {
+            if (game.player.ability.contact(enemy)) {
+                damageEnemy(enemy, 10);
+            }
+        }
         game.mines.forEach(mine => {
             if (mine.detonationStage == 2 && mine.contact(enemy)) {
-                enemy.hitPoints -= 5;
-                if (enemy.hitPoints <= 0) {
-                    game.stats.registerKill();
-                    if (enemy instanceof rib) {
-                        game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
-                    }
-                    else if (enemy instanceof Destroyer) {
-                        game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
-                    }
-                    else if (enemy instanceof Submarine) {
-                        game.stats.coinList.push(new Coin(enemy.x, enemy.y, 5));
-                    }
-                }
+                damageEnemy(enemy, 5);
             }
         })
         // updates hitpoints for all player bullets.
@@ -127,21 +153,13 @@ function updateEnemies() {
             if (enemy.contact(bullet)) {
                 if (enemy instanceof Submarine) {
                     if (!enemy.underwater) {
-                        enemy.hitPoints -= 1;
+                        damageEnemy(enemy, 1);
                         bullet.hitPoints -= 1;
-                        if (enemy.hitPoints < 1) {
-                            game.stats.registerKill();
-                            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 5));
-                        }
                     }
                 }
                 else {
-                    enemy.hitPoints -= 1;
+                    damageEnemy(enemy, 1);
                     bullet.hitPoints -= 1;
-                    if (enemy.hitPoints < 1) {
-                        game.stats.registerKill();
-                        game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
-                    }
                 }
             }
         })
@@ -160,6 +178,12 @@ function updateEnemies() {
         // If enemy is a Destroyer, loop through all its bullets.
         if (enemy instanceof Destroyer) {
             enemy.bullets.forEach(bullet => {
+                // enemy hits shield.
+                if (game.player.ability instanceof ShieldAbility && game.player.ability.active) {
+                    if (game.player.ability.contact(bullet)) {
+                        bullet.hitPoints -= 10;
+                    }
+                }
                 // enemy hits player.
                 if (game.player.contact(bullet)) {
                     game.player.takeDamage();
@@ -167,8 +191,8 @@ function updateEnemies() {
                 }
                 // enemy hits another enemy.
                 game.enemies.forEach(p => {
-                    if (p.contact(bullet) && !(p instanceof Destroyer)) {
-                        p.hitPoints -= 1;
+                    if (p.contact(bullet) && !(p instanceof Destroyer) && !(p instanceof Submarine && p.underwater)) {
+                        damageEnemy(p, 1);
                         bullet.hitPoints -= 1;
                     }
                 })
@@ -212,9 +236,11 @@ function gameLoop() {
     ammoLabel.textContent = game.player.weapon.ammo;
     killsLabel.textContent = game.stats.kills;
 
-    info.textContent = "X: " + Math.round(game.player.x) + ", Y: " + Math.round(game.player.y) + ", Angle: " + Math.round(game.player.angle / Math.PI * 180) + "\nshotAngle: " + Math.round(game.player.shotAngle / Math.PI * 180) + " Ammo: " + game.player.weapon.ammo;
-
-    //queues next framew
+    //info.textContent = "X: " + Math.round(game.player.x) + ", Y: " + Math.round(game.player.y) + ", Angle: " + Math.round(game.player.angle / Math.PI * 180) + "\nshotAngle: " + Math.round(game.player.shotAngle / Math.PI * 180) + " Ammo: " + game.player.weapon.ammo;
+    if (keys.m) {
+        game.stats.coins += 1000;
+    }
+    //queues next frame
     if (game.player.hitPoints < 1 || keys.p) {
         displayEndscreen();
     }
@@ -244,7 +270,7 @@ const mineRedImg = document.getElementById(Settings.img.mineRed);
 const explosion75Img = document.getElementById(Settings.img.explosion75);
 const heartImg = document.getElementById(Settings.img.heart);
 const skullImg = document.getElementById(Settings.img.skull);
-
+const shieldImg = document.getElementById(Settings.img.shield);
 
 
 
@@ -257,6 +283,7 @@ const ammoLabel = document.getElementById("ammo-value");
 const healthLabel = document.getElementById("health-value");
 const killsLabel = document.getElementById("kills-value");
 const coinsLabel = document.getElementById("coin-value");
+const abilityLabel = document.getElementById("ability-status");
 var startButtonValid = true;
 
 
@@ -289,6 +316,7 @@ function startGame() {
         game.statsDisplay.push(new statElement(item));
     });
     game.statsDisplay.push(new statElement(game.player.speed));
+    game.statsDisplay.push(new statElement(game.player.ability.available));
     document.getElementById('upgrade-container').style.visibility = "visible";
     document.getElementById('info-container').style.visibility = "visible";
     document.getElementById('how-to-play').textContent = "";

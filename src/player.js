@@ -2,6 +2,7 @@ import { normalizeAngle } from "./tools/angle.js";
 import { Entity } from "./tools/entity.js";
 import { Weapon } from "./weapon.js";
 import { Upgradable } from "./tools/upgradable.js";
+import { ShieldAbility } from "./shield.js";
 
 export class Player extends Entity {
     constructor(x, y, angle, speed, width, height, hitPoints, stats) {
@@ -11,6 +12,7 @@ export class Player extends Entity {
         this.shotAngle = angle;
         this.lastDamage = new Date();
         this.weapon = new Weapon(700, 50, 1000, stats);
+        this.ability = new ShieldAbility(100, 5000, 30000, stats);
     }
 
 
@@ -106,6 +108,10 @@ export class Player extends Entity {
         if (keys.Space) {
             this.weapon.fire(this.x, this.y, this.shotAngle);
         }
+        if (keys.e) {
+            this.ability.activate();
+        }
+        this.ability.update(this);
         this.weapon.update();
         super.update();
     }

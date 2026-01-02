@@ -3,7 +3,9 @@ export const keys = {
     a: false,
     s: false,
     d: false,
+    e: false,
     p: false,
+    m: false,
     ArrowLeft: false,
     ArrowRight: false,
     Space: false

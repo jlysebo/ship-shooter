@@ -16,6 +16,9 @@ export class Upgradable {
             this.value += this.increment;
             this.cost += this.costIncrement;
             this.level += 1;
+            if (this.level == this.maxLevel) {
+                this.cost = "Max";
+            }
         }
     }
 }

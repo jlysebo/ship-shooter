@@ -5,7 +5,7 @@ export class Weapon {
     constructor(shotDelay, capacity, reloadDelay, stats) {
         this.shotDelay = new Upgradable("Shot Delay", shotDelay, -50, 10, 0, 12, stats);
         this.capacity = new Upgradable("Ammo Capacity", capacity, 20, 5, 1, 1000, stats);
-        this.reloadDelay = new Upgradable("Reload Delay", reloadDelay, -50, 5, 1, 10, stats);
+        this.reloadDelay = new Upgradable("Reload Delay", reloadDelay, -50, 5, 1, 18, stats);
         this.stats = stats;
         this.bulletSpeed = new Upgradable("Bullet Speed", 10, 0.5, 10, 5, 10, stats);
         this.ammo = capacity;

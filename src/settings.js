@@ -25,6 +25,7 @@ export const Settings = {
         explosion75: "explosion75",
         heart: "heart",
         skull: "skull",
+        shield: "shield",
     }
 }
 

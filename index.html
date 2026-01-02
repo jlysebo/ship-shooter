@@ -24,6 +24,7 @@
                 <li>Shoot enemies with spacebar.</li>
                 <li>Collect coins to earn points for upgrades.</li>
                 <li>Avoid enemy ships and their missiles.</li>
+                <li>Press E to use ability.</li>
             </ul>
         </div>
         <div class="upgrade-container" style="visibility:hidden;" id="upgrade-container">
@@ -50,6 +51,10 @@
                     <img src="assets/sprites/skull.png" alt="Kills" class="icon"></img>
                     <span class="stat-label"></span> <span id="kills-value">0</span>
                 </div>
+                <div class="grid-item">
+                    <img src="assets/sprites/shield.png" alt="Ability" class="icon"></img>
+                    <span class="stat-label"></span> <span id="ability-status">Ready</span>
+                </div>
             </div>
             <p id="info"></p>                
             </div>
@@ -72,6 +77,7 @@
         <img id="explosion75" src="assets/sprites/explosion75.png" style="display:none;"></img>
         <img id="heart" src="assets/sprites/heart.png" style="display:none;"></img>
         <img id="skull" src="assets/sprites/skull.png" style="display:none;"></img>
+        <img id="shield" src="assets/sprites/shield.png" style="display:none;"></img>
     </div>
     <script type="module" src="game.js"></script>
 </body>
