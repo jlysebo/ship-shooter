@@ -11,6 +11,9 @@ import { Coin } from "./src/coin.js";
 import { statElement } from "./src/tools/statElement.js";
 import { Submarine } from "./src/submarine.js";
 import { ShieldAbility } from "./src/shield.js";
+import { Heart } from "./src/heart.js";
+import { Multishot } from "./src/multishot.js";
+import { Shotgun } from "./src/shotgun.js";
 
 let game = {};
 
@@ -18,12 +21,20 @@ function drawCanvas() {
     ctx.clearRect(0, 0, Settings.window.width, Settings.window.height);
     drawRotatedImage(playerImg, game.player.x, game.player.y, game.player.angle);
     drawRotatedImage(cannonImg, game.player.x, game.player.y, game.player.shotAngle);
-    game.stats.coinList.forEach(coin => {
-        if (coin.value == 1) {
-            drawRotatedImage(coin1Img, coin.x, coin.y, 0);
+    game.stats.itemList.forEach(item => {
+        if (item instanceof Coin) {
+            if (item.value == 1) {
+                drawRotatedImage(coin1Img, item.x, item.y, 0);
+            }
+            else if (item.value == 5) {
+                drawRotatedImage(coin5Img, item.x, item.y, 0);
+            }
         }
-        else if (coin.value == 5) {
-            drawRotatedImage(coin5Img, coin.x, coin.y, 0);
+        else if (item instanceof Heart) {
+            drawRotatedImage(heartImg, item.x, item.y, 0);
+        }
+        else if (item instanceof Multishot) {
+            drawRotatedImage(multishotImg, item.x, item.y, 0);
         }
     })
     game.player.weapon.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
@@ -94,27 +105,46 @@ function spawnEnemy(buffer) {
     }
 }
 
-function updateCoins() {
-    game.stats.coinList.forEach(coin => {
-        if (game.player.contact(coin)) {
-            coin.active = false;
+function updateItems() {
+    game.stats.itemList.forEach(item => {
+        if (game.player.contact(item)) {
+            if (item instanceof Coin) {
+                game.stats.coins += item.value;
+            }
+            else if (item instanceof Heart) {
+                game.player.hitPoints += 1;
+            }
+            else if (item instanceof Multishot) {
+                game.player.weapon = new Shotgun(game.player.weapon);
+                weaponLabel.textContent = "Multishot: " + game.player.weapon.multishot;
+            }
+            item.active = false;
         }
     })
-    game.stats.refreshCoinList();
+    game.stats.refreshItems();
 }
 
 function damageEnemy(enemy, damage) {
     enemy.hitPoints -= damage;
     if (enemy.hitPoints <= 0) {
         game.stats.registerKill();
-        if (enemy instanceof rib) {
-            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+        const number = randomInteger(0,1000); 
+        if (number > 985) {
+            game.stats.itemList.push(new Heart(enemy.x, enemy.y, 1));
         }
-        else if (enemy instanceof Destroyer) {
-            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 1));
+        else if (number > 975) {
+            game.stats.itemList.push(new Multishot(enemy.x, enemy.y, 1));
         }
-        else if (enemy instanceof Submarine) {
-            game.stats.coinList.push(new Coin(enemy.x, enemy.y, 5));
+        else {
+            if (enemy instanceof rib) {
+                game.stats.itemList.push(new Coin(enemy.x, enemy.y, 1));
+            }
+            else if (enemy instanceof Destroyer) {
+                game.stats.itemList.push(new Coin(enemy.x, enemy.y, 1));
+            }
+            else if (enemy instanceof Submarine) {
+                game.stats.itemList.push(new Coin(enemy.x, enemy.y, 5));
+            }
         }
     }
 }
@@ -228,7 +258,7 @@ function gameLoop() {
     game.player.update(keys);
     game.player.updateBullets();
     updateEnemies()
-    updateCoins();
+    updateItems();
     drawCanvas();
 
     healthLabel.textContent = game.player.hitPoints;
@@ -271,6 +301,7 @@ const explosion75Img = document.getElementById(Settings.img.explosion75);
 const heartImg = document.getElementById(Settings.img.heart);
 const skullImg = document.getElementById(Settings.img.skull);
 const shieldImg = document.getElementById(Settings.img.shield);
+const multishotImg = document.getElementById(Settings.img.multishot);
 
 
 
@@ -284,6 +315,7 @@ const healthLabel = document.getElementById("health-value");
 const killsLabel = document.getElementById("kills-value");
 const coinsLabel = document.getElementById("coin-value");
 const abilityLabel = document.getElementById("ability-status");
+const weaponLabel = document.getElementById("weapon-status");
 var startButtonValid = true;
 
 
@@ -294,7 +326,7 @@ function continueGame() {
     game.player.weapon.ammo = game.player.weapon.capacity.value;
     game.enemies.length = 0;
     game.mines.length = 0;
-    game.stats.coinList.length = 0;
+    game.stats.itemList.length = 0;
     game.stats.level = 1;
     setupInput();
     gameLoop();

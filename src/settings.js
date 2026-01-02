@@ -26,6 +26,7 @@ export const Settings = {
         heart: "heart",
         skull: "skull",
         shield: "shield",
+        multishot: "multishot",
     }
 }
 

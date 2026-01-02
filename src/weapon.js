@@ -14,6 +14,7 @@ export class Weapon {
         this.lastBulletFired = new Date();
         this.lastReloadTime = new Date();
         this.upgradable = [this.shotDelay, this.capacity, this.reloadDelay, this.bulletSpeed];
+        this.multishot = 1;
     }
 
     bulletReady() {
