@@ -6,6 +6,7 @@ import { rib } from "./src/rib.js";
 import { randomDecimal, randomInteger, randomXY } from "./src/tools/random.js";
 import { distance } from "./src/tools/calculations.js";
 import { Destroyer } from "./src/destroyer.js";
+import { Cruiser } from "./src/cruiser.js";
 import { gameStats } from "./src/gameStats.js";
 import { Coin } from "./src/coin.js";
 import { statElement } from "./src/tools/statElement.js";
@@ -57,6 +58,10 @@ function drawCanvas() {
         if (enemy instanceof Destroyer) {
             drawRotatedImage(destroyerImg, enemy.x, enemy.y, enemy.angle);
             enemy.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
+        }
+        if (enemy instanceof Cruiser) {
+            drawRotatedImage(cruiserImg, enemy.x, enemy.y, enemy.angle);
+            enemy.missiles.forEach(bullet => drawRotatedImage(missileImg, bullet.x, bullet.y, bullet.angle));
         }
         if (enemy instanceof Submarine) {
             if (enemy.underwater) {
@@ -111,6 +116,9 @@ function spawnEnemy(buffer) {
     while (distance(game.player.x, game.player.y, xy[0], xy[1]) < buffer) {
         xy = randomXY();
     }
+    if (dice == 4) {
+        game.enemies.push(new Cruiser(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.0, 1.5), 35, 85, 3, randomInteger(350, 550), randomInteger(2000, 3000)));
+    }
     if (dice == 5) {
         game.enemies.push(new Submarine(xy[0], xy[1], randomInteger(0, 6), randomDecimal(1.5, 2.2), 25, 80, 3, randomInteger(4000, 5000), randomInteger(0, 4)));
     }
@@ -158,6 +166,9 @@ function damageEnemy(enemy, damage) {
             }
             else if (enemy instanceof Destroyer) {
                 game.stats.itemList.push(new Coin(enemy.x, enemy.y, 1));
+            }
+            else if (enemy instanceof Cruiser) {
+                game.stats.itemList.push(new Coin(enemy.x, enemy.y, 5));
             }
             else if (enemy instanceof Submarine) {
                 game.stats.itemList.push(new Coin(enemy.x, enemy.y, 5));
@@ -252,6 +263,36 @@ function updateEnemies() {
                 })
             })
         }
+        // If enemy is a Cruiser, loop through all its bullets.
+        else if (enemy instanceof Cruiser) {
+            enemy.missiles.forEach(missile => {
+                // enemy hits shield.
+                if (game.player.ability instanceof ShieldAbility && game.player.ability.active) {
+                    if (game.player.ability.contact(missile)) {
+                        missile.hitPoints -= 10;
+                    }
+                }
+                // enemy hits player.
+                if (game.player.contact(missile)) {
+                    game.player.takeDamage();
+                    missile.hitPoints -= 1;
+                }
+                // enemy hits another enemy.
+                game.enemies.forEach(p => {
+                    if (p.contact(missile) && !(p instanceof Cruiser) && !(p instanceof Submarine && p.underwater)) {
+                        damageEnemy(p, 1);
+                        missile.hitPoints -= 1;
+                    }
+                })
+                // bullet hits bullet.
+                game.player.weapon.bullets.forEach(q => {
+                    if (missile.contact(q)) {
+                        missile.hitPoints -= 1;
+                        q.hitPoints -= 1;
+                    }
+                })
+            })
+        }
     });
     if (game.enemies.length == 0) {
         for (let i = 0; i <= game.stats.level; i++) {
@@ -308,8 +349,10 @@ const ctx = canvas.getContext("2d");
 const playerImg = document.getElementById(Settings.img.player);
 const cannonImg = document.getElementById(Settings.img.cannon);
 const bulletImg = document.getElementById(Settings.img.bullet);
+const missileImg = document.getElementById(Settings.img.missile);
 const enemy1Img = document.getElementById(Settings.img.enemy1);
 const destroyerImg = document.getElementById(Settings.img.destroyer);
+const cruiserImg = document.getElementById(Settings.img.cruiser);
 const coin1Img = document.getElementById(Settings.img.coin_1);
 const coin5Img = document.getElementById(Settings.img.coin_5);
 const submarineImg = document.getElementById(Settings.img.submarine);
