@@ -14,6 +14,8 @@ import { ShieldAbility } from "./src/shield.js";
 import { Heart } from "./src/heart.js";
 import { Multishot } from "./src/multishot.js";
 import { Shotgun } from "./src/shotgun.js";
+import { Airstrike } from "./airstrike.js";
+import { calculateAngle } from "./src/tools/angle.js";
 
 let game = {};
 
@@ -50,6 +52,17 @@ function drawCanvas() {
         }
     })
     game.player.weapon.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
+    game.mines.forEach(mine => {
+        if (mine.detonationStage >= 2) {
+            drawRotatedImage(explosion75Img, mine.x, mine.y, mine.angle);
+        }
+        else if (mine.detonationStage == 1) {
+            drawRotatedImage(mineRedImg, mine.x, mine.y, mine.angle);
+        }
+        else if (mine.detonationStage == 0) {
+            drawRotatedImage(mineImg, mine.x, mine.y, mine.angle);
+        }
+    })
     game.enemies.forEach(enemy => {
         if (enemy instanceof rib) {
             drawRotatedImage(enemy1Img, enemy.x, enemy.y, enemy.angle);
@@ -66,18 +79,18 @@ function drawCanvas() {
                 drawRotatedImage(submarineImg, enemy.x, enemy.y, enemy.angle);
             }
         }
+        if (enemy instanceof Airstrike) {
+            if (enemy.stage == 0) {
+                console.log("line");
+                ctx.fillStyle = "#2d3fff";
+                ctx.beginPath();
+                ctx.moveTo(enemy.x, enemy.y);
+                ctx.lineTo(enemy.x+Math.cos(enemy.angle)*1000, enemy.y+Math.sin(enemy.angle)*1000);
+                ctx.stroke();
+            }
+            drawRotatedImage(fighterjetImg, enemy.x, enemy.y, enemy.angle);
+        }
     });
-    game.mines.forEach(mine => {
-        if (mine.detonationStage >= 2) {
-            drawRotatedImage(explosion75Img, mine.x, mine.y, mine.angle);
-        }
-        else if (mine.detonationStage == 1) {
-            drawRotatedImage(mineRedImg, mine.x, mine.y, mine.angle);
-        }
-        else if (mine.detonationStage == 0) {
-            drawRotatedImage(mineImg, mine.x, mine.y, mine.angle);
-        }
-    })
     if (game.player.ability instanceof ShieldAbility) {
         const tempDate = new Date();
         if (game.player.ability.available.value) {
@@ -261,6 +274,10 @@ function updateEnemies() {
     }
     game.enemies = game.enemies.filter(enemy => enemy.hitPoints > 0);
     game.mines = game.mines.filter(mine => mine.hitPoints > 0);
+    if (randomInteger(0,10000) > 9990) {
+        let airY = randomInteger(150, 500);
+        game.enemies.push(new Airstrike(0, airY, calculateAngle(0, airY, game.player.x, game.player.y), 5, 1, game,100));
+    }
 }
 
 function displayEndscreen() {
@@ -324,6 +341,7 @@ const multishotImg = document.getElementById(Settings.img.multishot);
 const seashore_cornerImg = document.getElementById(Settings.img.seashore_corner);
 const seashore_sideImg = document.getElementById(Settings.img.seashore_side);
 const sea_middleImg = document.getElementById(Settings.img.sea_middle);
+const fighterjetImg = document.getElementById(Settings.img.fighterjet);
 
 
 

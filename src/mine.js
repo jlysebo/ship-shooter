@@ -25,7 +25,7 @@ export class Mine extends Entity {
     update(tempDate, mineList) {
         if (this.detonationStage >= 2) {
             this.detonationStage = 3;
-            if (tempDate - this.detonationTime > 500) {
+            if (tempDate - this.detonationTime > 150) {
                 this.hitPoints = 0;
             }
         }

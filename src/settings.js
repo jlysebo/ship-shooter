@@ -30,6 +30,7 @@ export const Settings = {
         seashore_side: "seashore_side",
         seashore_corner: "seashore_corner",
         sea_middle: "sea_middle",
+        fighterjet: "fighterjet",
     }
 }
 
