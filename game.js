@@ -32,7 +32,7 @@ function drawCanvas() {
         drawRotatedImage(seashore_sideImg, 25, i, 0);
         drawRotatedImage(seashore_sideImg, Settings.window.width - 25, i, Math.PI);
         drawRotatedImage(seashore_sideImg, i, 25, Math.PI / 2);
-        drawRotatedImage(seashore_sideImg, i, Settings.window.height - 25, 3 * Math.PI/2);
+        drawRotatedImage(seashore_sideImg, i, Settings.window.height - 25, 3 * Math.PI / 2);
     }
     drawRotatedImage(playerImg, game.player.x, game.player.y, game.player.angle);
     drawRotatedImage(cannonImg, game.player.x, game.player.y, game.player.shotAngle);
@@ -64,6 +64,9 @@ function drawCanvas() {
             drawRotatedImage(mineImg, mine.x, mine.y, mine.angle);
         }
     })
+    game.missiles.forEach(missile => { 
+        drawRotatedImage(missileImg, missile.x, missile.y, missile.angle)    }
+    )
     game.enemies.forEach(enemy => {
         if (enemy instanceof rib) {
             drawRotatedImage(enemy1Img, enemy.x, enemy.y, enemy.angle);
@@ -74,7 +77,6 @@ function drawCanvas() {
         }
         if (enemy instanceof Cruiser) {
             drawRotatedImage(cruiserImg, enemy.x, enemy.y, enemy.angle);
-            enemy.missiles.forEach(bullet => drawRotatedImage(missileImg, bullet.x, bullet.y, bullet.angle));
         }
         if (enemy instanceof Submarine) {
             if (enemy.underwater) {
@@ -90,7 +92,7 @@ function drawCanvas() {
                 ctx.fillStyle = "#2d3fff";
                 ctx.beginPath();
                 ctx.moveTo(enemy.x, enemy.y);
-                ctx.lineTo(enemy.x+Math.cos(enemy.angle)*1000, enemy.y+Math.sin(enemy.angle)*1000);
+                ctx.lineTo(enemy.x + Math.cos(enemy.angle) * 1000, enemy.y + Math.sin(enemy.angle) * 1000);
                 ctx.stroke();
             }
             drawRotatedImage(fighterjetImg, enemy.x, enemy.y, enemy.angle);
@@ -206,6 +208,35 @@ function updateEnemies() {
             }
         })
     });
+
+    game.missiles.forEach(missile => {
+        missile.move({ x: game.player.x, y: game.player.y })
+        // enemy hits shield.
+        if (game.player.ability instanceof ShieldAbility && game.player.ability.active) {
+            if (game.player.ability.contact(missile)) {
+                missile.hitPoints -= 10;
+            }
+        }
+        // enemy hits player.
+        if (game.player.contact(missile)) {
+            game.player.takeDamage();
+            missile.hitPoints -= 1;
+        }
+        // enemy hits another enemy.
+        game.enemies.forEach(p => {
+            if (p.contact(missile) && !(p instanceof Cruiser) && !(p instanceof Submarine && p.underwater)) {
+                damageEnemy(p, 1);
+                missile.hitPoints -= 1;
+            }
+        })
+        // bullet hits bullet.
+        game.player.weapon.bullets.forEach(q => {
+            if (missile.contact(q)) {
+                missile.hitPoints -= 1;
+                q.hitPoints -= 1;
+            }
+        })
+    })
     // mine kills enemy
     game.enemies.forEach(enemy => {
         enemy.update(game.player);
@@ -278,35 +309,12 @@ function updateEnemies() {
         }
         // If enemy is a Cruiser, loop through all its bullets.
         else if (enemy instanceof Cruiser) {
-            enemy.missiles.forEach(missile => {
-                // enemy hits shield.
-                if (game.player.ability instanceof ShieldAbility && game.player.ability.active) {
-                    if (game.player.ability.contact(missile)) {
-                        missile.hitPoints -= 10;
-                    }
-                }
-                // enemy hits player.
-                if (game.player.contact(missile)) {
-                    game.player.takeDamage();
-                    missile.hitPoints -= 1;
-                }
-                // enemy hits another enemy.
-                game.enemies.forEach(p => {
-                    if (p.contact(missile) && !(p instanceof Cruiser) && !(p instanceof Submarine && p.underwater)) {
-                        damageEnemy(p, 1);
-                        missile.hitPoints -= 1;
-                    }
-                })
-                // bullet hits bullet.
-                game.player.weapon.bullets.forEach(q => {
-                    if (missile.contact(q)) {
-                        missile.hitPoints -= 1;
-                        q.hitPoints -= 1;
-                    }
-                })
-            })
+            while (enemy.missiles.length > 0) {
+                game.missiles.push(enemy.missiles.pop());
+            }
         }
     });
+
     if (game.enemies.length == 0) {
         for (let i = 0; i <= game.stats.level; i++) {
             spawnEnemy(250);
@@ -315,9 +323,10 @@ function updateEnemies() {
     }
     game.enemies = game.enemies.filter(enemy => enemy.hitPoints > 0);
     game.mines = game.mines.filter(mine => mine.hitPoints > 0);
-    if (randomInteger(0,10000) > 9990) {
+    game.missiles = game.missiles.filter(missile => missile.hitPoints > 0);
+    if (randomInteger(0, 10000) > 9990) {
         let airY = randomInteger(150, 500);
-        game.enemies.push(new Airstrike(0, airY, calculateAngle(0, airY, game.player.x, game.player.y), 5, 1, game,100));
+        game.enemies.push(new Airstrike(0, airY, calculateAngle(0, airY, game.player.x, game.player.y), 5, 1, game, 100));
     }
 }
 
@@ -408,6 +417,7 @@ function continueGame() {
     game.player.weapon.ammo = game.player.weapon.capacity.value;
     game.enemies.length = 0;
     game.mines.length = 0;
+    game.missiles.length = 0;
     game.stats.itemList.length = 0;
     game.stats.level = 1;
     setupInput();
@@ -424,6 +434,7 @@ function startGame() {
         statsDisplay: [],
         enemies: [],
         mines: [],
+        missiles: [],
     }
     game.statsDisplay.length = 0;
     game.player.weapon.upgradable.forEach(item => {
