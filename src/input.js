@@ -6,6 +6,9 @@ export const keys = {
     e: false,
     p: false,
     m: false,
+    o: false,
+    n: false,
+    y: false,
     ArrowLeft: false,
     ArrowRight: false,
     Space: false

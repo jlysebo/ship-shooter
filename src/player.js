@@ -3,6 +3,7 @@ import { Entity } from "./tools/entity.js";
 import { Weapon } from "./weapon.js";
 import { Upgradable } from "./tools/upgradable.js";
 import { ShieldAbility } from "./shield.js";
+import { miniShield } from "./miniShield.js";
 
 export class Player extends Entity {
     constructor(x, y, angle, speed, width, height, hitPoints, stats) {
@@ -13,6 +14,7 @@ export class Player extends Entity {
         this.lastDamage = new Date();
         this.weapon = new Weapon(700, 50, 1000, stats);
         this.ability = new ShieldAbility(100, 5000, 30000, stats);
+        this.secondaryAbility = null;
     }
 
 
@@ -42,7 +44,14 @@ export class Player extends Entity {
      */
     takeDamage() {
         const tempDate = new Date();
-        if (this.lastDamage < tempDate - 2000) {
+        if (this.secondaryAbility instanceof miniShield && this.secondaryAbility.hitPoints > 0) {
+            this.secondaryAbility.hitPoints -= 1;
+            this.lastDamage = tempDate;
+            if (this.secondaryAbility.hitPoints <= 0) {
+                this.secondaryAbility = null;
+            }
+        }
+        else if (this.lastDamage < tempDate - 1600) {
             this.hitPoints -= 1;
             this.lastDamage = tempDate;
         }
@@ -112,6 +121,12 @@ export class Player extends Entity {
             this.ability.activate();
         }
         this.ability.update(this);
+        if (this.secondaryAbility instanceof miniShield) {
+            let tempDate = new Date();
+            if (tempDate - this.secondaryAbility.aquiredTime > this.secondaryAbility.time) {
+                this.secondaryAbility = null;
+            }
+        }
         this.weapon.update();
         super.update();
     }

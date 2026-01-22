@@ -22,7 +22,7 @@ export class Cruiser extends Enemy {
 		else if (this.lastShotTime < tempDate - this.reloadTime) {
 			this.lastUpdate = tempDate;
 			this.adjustAngle(player);
-			this.missiles.push(new Missle(this.x, this.y, this.angle, 3, 11, 11, 1))
+			this.missiles.push(new Missle(this.x, this.y, this.angle, 3, 11, 11, 1, Math.PI/4))
 			this.lastShotTime = tempDate;
 			this.reloadTime = randomInteger(2000, 4000);
 		}

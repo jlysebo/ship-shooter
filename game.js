@@ -17,6 +17,9 @@ import { Multishot } from "./src/multishot.js";
 import { Shotgun } from "./src/shotgun.js";
 import { Airstrike } from "./airstrike.js";
 import { calculateAngle } from "./src/tools/angle.js";
+import { miniShield } from "./src/miniShield.js";
+import { ClusterMine } from "./src/clusterMine.js";
+import { helicopter } from "./src/helicopter.js";
 
 let game = {};
 
@@ -51,6 +54,9 @@ function drawCanvas() {
         else if (item instanceof Multishot) {
             drawRotatedImage(multishotImg, item.x, item.y, 0);
         }
+        else if (item instanceof miniShield) {
+            drawRotatedImage(mini_shieldImg, item.x, item.y, 0);
+        }
     })
     game.player.weapon.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
     game.mines.forEach(mine => {
@@ -64,8 +70,9 @@ function drawCanvas() {
             drawRotatedImage(mineImg, mine.x, mine.y, mine.angle);
         }
     })
-    game.missiles.forEach(missile => { 
-        drawRotatedImage(missileImg, missile.x, missile.y, missile.angle)    }
+    game.missiles.forEach(missile => {
+        drawRotatedImage(missileImg, missile.x, missile.y, missile.angle)
+    }
     )
     game.enemies.forEach(enemy => {
         if (enemy instanceof rib) {
@@ -86,7 +93,10 @@ function drawCanvas() {
                 drawRotatedImage(submarineImg, enemy.x, enemy.y, enemy.angle);
             }
         }
-        if (enemy instanceof Airstrike) {
+        if (enemy instanceof helicopter) {
+            drawRotatedImage(helicopterImg, enemy.x, enemy.y, enemy.angle);
+        }
+        else if (enemy instanceof Airstrike) {
             if (enemy.stage == 0) {
                 console.log("line");
                 ctx.fillStyle = "#2d3fff";
@@ -118,6 +128,9 @@ function drawCanvas() {
         else {
             abilityLabel.textContent = "Not Bought";
         }
+    }
+    if (game.player.secondaryAbility instanceof miniShield) {
+        drawRotatedImage(mini_shield_auraImg, game.player.x, game.player.y, 0);
     }
 }
 
@@ -158,6 +171,10 @@ function updateItems() {
                 game.player.weapon = new Shotgun(game.player.weapon);
                 weaponLabel.textContent = "Multishot: " + game.player.weapon.multishot;
             }
+            else if (item instanceof miniShield) {
+                game.player.secondaryAbility = item;
+                item.aquire();
+            }
             item.active = false;
         }
     })
@@ -169,11 +186,14 @@ function damageEnemy(enemy, damage) {
     if (enemy.hitPoints <= 0) {
         game.stats.registerKill();
         const number = randomInteger(0, 1000);
-        if (number > 985) {
+        if (number > 975 && game.player.hitPoints < 5) {
             game.stats.itemList.push(new Heart(enemy.x, enemy.y, 1));
         }
-        else if (number > 975) {
+        else if (number > 960) {
             game.stats.itemList.push(new Multishot(enemy.x, enemy.y, 1));
+        }
+        else if (number > 900) {
+            game.stats.itemList.push(new miniShield(enemy.x, enemy.y, 100, 5000, 1));
         }
         else {
             if (enemy instanceof rib) {
@@ -208,7 +228,7 @@ function updateEnemies() {
             }
         })
     });
-
+    console.log(game.missiles.length);
     game.missiles.forEach(missile => {
         missile.move({ x: game.player.x, y: game.player.y })
         // enemy hits shield.
@@ -324,9 +344,29 @@ function updateEnemies() {
     game.enemies = game.enemies.filter(enemy => enemy.hitPoints > 0);
     game.mines = game.mines.filter(mine => mine.hitPoints > 0);
     game.missiles = game.missiles.filter(missile => missile.hitPoints > 0);
-    if (randomInteger(0, 10000) > 9990) {
+    let rand = randomInteger(0, 10000);
+    if (rand > 9991) {
         let airY = randomInteger(150, 500);
-        game.enemies.push(new Airstrike(0, airY, calculateAngle(0, airY, game.player.x, game.player.y), 5, 1, game, 100));
+        let airX = randomInteger(150, 500);
+        let direction = randomInteger(0, 4);
+        if (direction == 0) {
+            airX = 0;
+        }
+        else if (direction == 1) {
+            airX = Settings.window.width;
+        }
+        else if (direction == 2) {
+            airY = 0;
+        }
+        else {
+            airY = Settings.window.height;
+        }
+        if (randomInteger(0, 2)) {
+            game.enemies.push(new Airstrike(airX, airY, calculateAngle(airX, airY, game.player.x, game.player.y), 5, 1, game, 100));
+        }
+        else {
+            game.enemies.push(new helicopter(airX, airY, calculateAngle(airX, airY, game.player.x, game.player.y), 3, 10, game, randomInteger(1800, 3000)));
+        }
     }
 }
 
@@ -352,8 +392,7 @@ function gameLoop() {
     ammoLabel.textContent = game.player.weapon.ammo;
     killsLabel.textContent = game.stats.kills;
 
-    //info.textContent = "X: " + Math.round(game.player.x) + ", Y: " + Math.round(game.player.y) + ", Angle: " + Math.round(game.player.angle / Math.PI * 180) + "\nshotAngle: " + Math.round(game.player.shotAngle / Math.PI * 180) + " Ammo: " + game.player.weapon.ammo;
-    if (keys.m) {
+    if (keys.m && keys.o && keys.n && keys.y) {
         game.stats.coins += 1000;
     }
     //queues next frame
@@ -394,6 +433,9 @@ const seashore_cornerImg = document.getElementById(Settings.img.seashore_corner)
 const seashore_sideImg = document.getElementById(Settings.img.seashore_side);
 const sea_middleImg = document.getElementById(Settings.img.sea_middle);
 const fighterjetImg = document.getElementById(Settings.img.fighterjet);
+const mini_shieldImg = document.getElementById(Settings.img.mini_shield);
+const mini_shield_auraImg = document.getElementById(Settings.img.mini_shield_aura);
+const helicopterImg = document.getElementById(Settings.img.helicopter);
 
 
 

@@ -33,6 +33,9 @@ export const Settings = {
         seashore_corner: "seashore_corner",
         sea_middle: "sea_middle",
         fighterjet: "fighterjet",
+        mini_shield: "mini_shield",
+        mini_shield_aura: "miniShieldAura",
+        helicopter: "helicopter",
     }
 }
 

@@ -1,0 +1,25 @@
+import { Airstrike } from "../airstrike.js";
+import { ClusterMine } from "./clusterMine.js";
+import { Settings } from "./settings.js";
+
+export class helicopter extends Airstrike {
+    constructor(x, y, angle, speed, hitPoints, game, dropDelay) {
+        super(x, y, angle, speed, hitPoints, game, dropDelay);
+    }
+
+    update(player) {
+        let tempDate = new Date();
+        if (0 <= this.x && Settings.window.width >= this.x && 0 <= this.y && Settings.window.height >= this.y) {
+            if (tempDate - this.lastStrike > this.dropDelay) {
+                this.game.mines.push(new ClusterMine(this.x, this.y, 0, 0, 25, 25, 1, 75, 3000, 6, Math.PI / 4, this.game));
+                this.lastStrike = tempDate;
+            }
+            this.moveX(this.nextX());
+            this.moveY(this.nextY());
+            this.lastUpdate = new Date();
+        }
+        else {
+            this.hitPoints = 0;
+        }
+    }
+}
