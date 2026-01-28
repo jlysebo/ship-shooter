@@ -25,7 +25,7 @@ export class Airstrike extends Enemy {
             }
         }
         if (this.stage == 1) {
-            if (0 <= this.x && Settings.window.width >= this.x && 0 <= this.y && Settings.window.height >= this.y) {
+            if (0 <= this.x && Settings.map.width >= this.x && 0 <= this.y && Settings.map.height >= this.y) {
                 if (tempDate - this.lastStrike > this.dropDelay) {
                     this.game.mines.push(new Mine(this.x, this.y, 0, 0, 25, 25, 1, 75, 100));
                     this.lastStrike = tempDate;

@@ -27,74 +27,80 @@ function drawCanvas() {
     ctx.clearRect(0, 0, Settings.window.width, Settings.window.height);
     ctx.drawImage(sea_middleImg, 0, 0, 650, 650);
     ctx.fillStyle = "#33CCCC";
-    drawRotatedImage(seashore_cornerImg, 25, 25, 0);
-    drawRotatedImage(seashore_cornerImg, Settings.window.width - 25, 25, Math.PI / 2);
-    drawRotatedImage(seashore_cornerImg, 25, Settings.window.height - 25, 3 * Math.PI / 2);
-    drawRotatedImage(seashore_cornerImg, Settings.window.width - 25, Settings.window.height - 25, Math.PI);
-    for (let i = 75; i < Settings.window.width - 25; i += 50) {
-        drawRotatedImage(seashore_sideImg, 25, i, 0);
-        drawRotatedImage(seashore_sideImg, Settings.window.width - 25, i, Math.PI);
-        drawRotatedImage(seashore_sideImg, i, 25, Math.PI / 2);
-        drawRotatedImage(seashore_sideImg, i, Settings.window.height - 25, 3 * Math.PI / 2);
+    updateVisualLocation();
+    drawRotatedImage(seashore_cornerImg, flooredVisualXY({ x: 75, y: 75 }), 0);
+    drawRotatedImage(seashore_cornerImg, flooredVisualXY({ x: Settings.map.width - 75, y: 75 }), Math.PI / 2);
+    drawRotatedImage(seashore_cornerImg, flooredVisualXY({ x: 75, y: Settings.map.height - 75 }), 3 * Math.PI / 2);
+    drawRotatedImage(seashore_cornerImg, flooredVisualXY({ x: Settings.map.width - 75, y: Settings.map.height - 75 }), Math.PI);
+    for (let i = 225; i < Settings.map.width - 150; i += 150) {
+        drawRotatedImage(seashore_sideImg, flooredVisualXY({ x: 74, y: i }), 0);
+        drawRotatedImage(seashore_sideImg, flooredVisualXY({ x: Settings.map.width - 74, y: i }), Math.PI);
+        drawRotatedImage(seashore_sideImg, flooredVisualXY({ x: i, y: 74 }), Math.PI / 2);
+        drawRotatedImage(seashore_sideImg, flooredVisualXY({ x: i, y: Settings.map.height - 74 }), 3 * Math.PI / 2);
+        for (let k = 225; k < Settings.map.height - 150; k += 150) {
+            drawRotatedImage(wavesImg, flooredVisualXY({x: i, y: k}), 0);
+        }
     }
-    drawRotatedImage(playerImg, game.player.x, game.player.y, game.player.angle);
-    drawRotatedImage(cannonImg, game.player.x, game.player.y, game.player.shotAngle);
+    /*
+    */
+    drawRotatedImage(playerImg, visualXY({ x: game.player.x, y: game.player.y }), game.player.angle);
+    drawRotatedImage(cannonImg, visualXY({ x: game.player.x, y: game.player.y }), game.player.shotAngle);
     game.stats.itemList.forEach(item => {
         if (item instanceof Coin) {
             if (item.value == 1) {
-                drawRotatedImage(coin1Img, item.x, item.y, 0);
+                drawRotatedImage(coin1Img, visualXY({ x: item.x, y: item.y }), 0);
             }
             else if (item.value == 5) {
-                drawRotatedImage(coin5Img, item.x, item.y, 0);
+                drawRotatedImage(coin5Img, visualXY({ x: item.x, y: item.y }), 0);
             }
         }
         else if (item instanceof Heart) {
-            drawRotatedImage(heartImg, item.x, item.y, 0);
+            drawRotatedImage(heartImg, visualXY({ x: item.x, y: item.y }), 0);
         }
         else if (item instanceof Multishot) {
-            drawRotatedImage(multishotImg, item.x, item.y, 0);
+            drawRotatedImage(multishotImg, visualXY({ x: item.x, y: item.y }), 0);
         }
         else if (item instanceof miniShield) {
-            drawRotatedImage(mini_shieldImg, item.x, item.y, 0);
+            drawRotatedImage(mini_shieldImg, visualXY({ x: item.x, y: item.y }), 0);
         }
     })
-    game.player.weapon.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
+    game.player.weapon.bullets.forEach(bullet => drawRotatedImage(bulletImg, visualXY({ x: bullet.x, y: bullet.y }), bullet.angle));
     game.mines.forEach(mine => {
         if (mine.detonationStage >= 2) {
-            drawRotatedImage(explosion75Img, mine.x, mine.y, mine.angle);
+            drawRotatedImage(explosion75Img, visualXY({ x: mine.x, y: mine.y }), mine.angle);
         }
         else if (mine.detonationStage == 1) {
-            drawRotatedImage(mineRedImg, mine.x, mine.y, mine.angle);
+            drawRotatedImage(mineRedImg, visualXY({ x: mine.x, y: mine.y }), mine.angle);
         }
         else if (mine.detonationStage == 0) {
-            drawRotatedImage(mineImg, mine.x, mine.y, mine.angle);
+            drawRotatedImage(mineImg, visualXY({ x: mine.x, y: mine.y }), mine.angle);
         }
     })
     game.missiles.forEach(missile => {
-        drawRotatedImage(missileImg, missile.x, missile.y, missile.angle)
+        drawRotatedImage(missileImg, visualXY({ x: missile.x, y: missile.y }), missile.angle)
     }
     )
     game.enemies.forEach(enemy => {
         if (enemy instanceof rib) {
-            drawRotatedImage(enemy1Img, enemy.x, enemy.y, enemy.angle);
+            drawRotatedImage(enemy1Img, visualXY({ x: enemy.x, y: enemy.y }), enemy.angle);
         }
         if (enemy instanceof Destroyer) {
-            drawRotatedImage(destroyerImg, enemy.x, enemy.y, enemy.angle);
-            enemy.bullets.forEach(bullet => drawRotatedImage(bulletImg, bullet.x, bullet.y, bullet.angle));
+            drawRotatedImage(destroyerImg, visualXY({ x: enemy.x, y: enemy.y }), enemy.angle);
+            enemy.bullets.forEach(bullet => drawRotatedImage(bulletImg, visualXY({ x: bullet.x, y: bullet.y }), bullet.angle));
         }
         if (enemy instanceof Cruiser) {
-            drawRotatedImage(cruiserImg, enemy.x, enemy.y, enemy.angle);
+            drawRotatedImage(cruiserImg, visualXY({ x: enemy.x, y: enemy.y }), enemy.angle);
         }
         if (enemy instanceof Submarine) {
             if (enemy.underwater) {
-                drawRotatedImage(submarineUnderwaterImg, enemy.x, enemy.y, enemy.angle);
+                drawRotatedImage(submarineUnderwaterImg, visualXY({ x: enemy.x, y: enemy.y }), enemy.angle);
             }
             else {
-                drawRotatedImage(submarineImg, enemy.x, enemy.y, enemy.angle);
+                drawRotatedImage(submarineImg, visualXY({ x: enemy.x, y: enemy.y }), enemy.angle);
             }
         }
         if (enemy instanceof helicopter) {
-            drawRotatedImage(helicopterImg, enemy.x, enemy.y, enemy.angle);
+            drawRotatedImage(helicopterImg, visualXY({ x: enemy.x, y: enemy.y }), enemy.angle);
         }
         else if (enemy instanceof Airstrike) {
             if (enemy.stage == 0) {
@@ -105,7 +111,7 @@ function drawCanvas() {
                 ctx.lineTo(enemy.x + Math.cos(enemy.angle) * 1000, enemy.y + Math.sin(enemy.angle) * 1000);
                 ctx.stroke();
             }
-            drawRotatedImage(fighterjetImg, enemy.x, enemy.y, enemy.angle);
+            drawRotatedImage(fighterjetImg, visualXY({ x: enemy.x, y: enemy.y }), enemy.angle);
         }
     });
     if (game.player.ability instanceof ShieldAbility) {
@@ -116,7 +122,7 @@ function drawCanvas() {
                 //ctx.beginPath();
                 //ctx.arc(game.player.x, game.player.y, game.player.ability.range, 0, 2 * Math.PI);
                 //ctx.stroke();
-                drawRotatedImage(shieldImg, game.player.x, game.player.y, game.player.angle);
+                drawRotatedImage(shieldImg, visualXY({ x: game.player.x, y: game.player.y }), game.player.angle);
             }
             else if (tempDate - game.player.ability.lastActivationTime > game.player.ability.cooldown + game.player.ability.duration) {
                 abilityLabel.textContent = "Ready";
@@ -130,7 +136,7 @@ function drawCanvas() {
         }
     }
     if (game.player.secondaryAbility instanceof miniShield) {
-        drawRotatedImage(mini_shield_auraImg, game.player.x, game.player.y, 0);
+        drawRotatedImage(mini_shield_auraImg, visualXY({ x: game.player.x, y: game.player.y }), 0);
     }
 }
 
@@ -159,7 +165,9 @@ function spawnEnemy(buffer) {
 }
 
 function updateItems() {
+    let tempDate = new Date();
     game.stats.itemList.forEach(item => {
+        item.update(tempDate);
         if (game.player.contact(item)) {
             if (item instanceof Coin) {
                 game.stats.coins += item.value;
@@ -189,7 +197,7 @@ function damageEnemy(enemy, damage) {
         if (number > 975 && game.player.hitPoints < 5) {
             game.stats.itemList.push(new Heart(enemy.x, enemy.y, 1));
         }
-        else if (number > 960) {
+        else if (number > 957) {
             game.stats.itemList.push(new Multishot(enemy.x, enemy.y, 1));
         }
         else if (number > 900) {
@@ -335,31 +343,31 @@ function updateEnemies() {
         }
     });
 
-    if (game.enemies.length == 0) {
+    if (game.enemies.length <= 1) {
         for (let i = 0; i <= game.stats.level; i++) {
             spawnEnemy(250);
         }
-        game.stats.level += 0.3;
+        game.stats.level += 0.4;
     }
     game.enemies = game.enemies.filter(enemy => enemy.hitPoints > 0);
     game.mines = game.mines.filter(mine => mine.hitPoints > 0);
     game.missiles = game.missiles.filter(missile => missile.hitPoints > 0);
     let rand = randomInteger(0, 10000);
     if (rand > 9991) {
-        let airY = randomInteger(150, 500);
-        let airX = randomInteger(150, 500);
+        let airY = randomInteger(150, Settings.map.height- 150);
+        let airX = randomInteger(150, Settings.map.width - 150);
         let direction = randomInteger(0, 4);
         if (direction == 0) {
             airX = 0;
         }
         else if (direction == 1) {
-            airX = Settings.window.width;
+            airX = Settings.map.width;
         }
         else if (direction == 2) {
             airY = 0;
         }
         else {
-            airY = Settings.window.height;
+            airY = Settings.map.height;
         }
         if (randomInteger(0, 2)) {
             game.enemies.push(new Airstrike(airX, airY, calculateAngle(airX, airY, game.player.x, game.player.y), 5, 1, game, 100));
@@ -368,6 +376,8 @@ function updateEnemies() {
             game.enemies.push(new helicopter(airX, airY, calculateAngle(airX, airY, game.player.x, game.player.y), 3, 10, game, randomInteger(1800, 3000)));
         }
     }
+    /*
+*/
 }
 
 function displayEndscreen() {
@@ -377,6 +387,43 @@ function displayEndscreen() {
     ctx.fillText("GAME OVER", 170, 330);
     startButtonValid = true;
     document.getElementById('button-container').style.display = "flex";
+}
+
+function visualXY(coordinates) {
+    let visualX = game.visualLocation.x;
+    let visualY = game.visualLocation.y;
+    return { x: coordinates.x - visualX, y: coordinates.y - visualY };
+}
+
+function flooredVisualXY(coordinates) {
+    let visualX = game.visualLocation.x;
+    let visualY = game.visualLocation.y;
+    return { x: Math.floor(coordinates.x - visualX), y: Math.floor(coordinates.y - visualY) };
+}
+
+function physicalXY(coordinates) {
+    let x = 325;
+    let y = 325;
+    let visualX = game.visualLocation.x;
+    let visualY = game.visualLocation.y;
+    return { x: coordinates.x + visualX - x, y: coordinates.y + visualY - y };
+}
+
+function updateVisualLocation() {
+    let changeX = game.player.x - game.visualLocation.playerX;
+    let changeY = game.player.y - game.visualLocation.playerY;
+    let newVisualX = game.visualLocation.x + changeX;
+    let newVisualY = game.visualLocation.y + changeY;
+    let margin = Settings.window.visualPadding;
+    let visualPlayerPos = visualXY({ x: game.player.x, y: game.player.y });
+    if (((visualPlayerPos.x < margin) && (game.player.x > margin) && (changeX < 0)) || ((visualPlayerPos.x > Settings.window.width - margin) && (game.player.x < Settings.map.width - margin) && (changeX > 0))) {
+        game.visualLocation.x += changeX;
+    }
+    if (((visualPlayerPos.y < margin) && (game.player.y > margin) && (changeY < 0)) || ((visualPlayerPos.y > Settings.window.height - margin) && (game.player.y < Settings.map.height - margin) && (changeY > 0))) {
+        game.visualLocation.y += changeY;
+    }
+    game.visualLocation.playerX = game.player.x;
+    game.visualLocation.playerY = game.player.y;
 }
 
 function gameLoop() {
@@ -391,6 +438,7 @@ function gameLoop() {
     coinsLabel.textContent = game.stats.coins;
     ammoLabel.textContent = game.player.weapon.ammo;
     killsLabel.textContent = game.stats.kills;
+    info.textContent = "X: " + game.player.x + ", Y: " + game.player.y + "Visual X: " + visualXY({ x: game.player.x, y: game.player.y }).x + ", Y: " + visualXY({ x: game.player.x, y: game.player.y }).y;
 
     if (keys.m && keys.o && keys.n && keys.y) {
         game.stats.coins += 1000;
@@ -431,6 +479,7 @@ const shieldImg = document.getElementById(Settings.img.shield);
 const multishotImg = document.getElementById(Settings.img.multishot);
 const seashore_cornerImg = document.getElementById(Settings.img.seashore_corner);
 const seashore_sideImg = document.getElementById(Settings.img.seashore_side);
+const wavesImg = document.getElementById(Settings.img.waves);
 const sea_middleImg = document.getElementById(Settings.img.sea_middle);
 const fighterjetImg = document.getElementById(Settings.img.fighterjet);
 const mini_shieldImg = document.getElementById(Settings.img.mini_shield);
@@ -462,6 +511,9 @@ function continueGame() {
     game.missiles.length = 0;
     game.stats.itemList.length = 0;
     game.stats.level = 1;
+    game.player.x = Settings.map.width / 2;
+    game.player.y = Settings.map.height / 2;
+    game.visualLocation = { x: game.player.x - Settings.window.width / 2, y: game.player.y - Settings.window.height / 2, playerX: Settings.map.width / 2, playerY: Settings.map.height / 2 },
     setupInput();
     gameLoop();
 }
@@ -472,13 +524,14 @@ function startGame() {
     const stats = new gameStats();
     game = {
         stats: stats,
-        player: new Player(Settings.window.width / 2, Settings.window.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats),
+        player: new Player(Settings.map.width / 2, Settings.map.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats),
         statsDisplay: [],
         enemies: [],
         mines: [],
         missiles: [],
     }
-    game.statsDisplay.length = 0;
+    game.visualLocation = { x: game.player.x - Settings.window.width / 2, y: game.player.y - Settings.window.height / 2, playerX: Settings.map.width / 2, playerY: Settings.map.height / 2 },
+        game.statsDisplay.length = 0;
     game.player.weapon.upgradable.forEach(item => {
         game.statsDisplay.push(new statElement(item));
     });

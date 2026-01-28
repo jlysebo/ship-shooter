@@ -78,7 +78,7 @@ export class Entity {
      * @returns true or false.
      */
     validateX(nextX) {
-        const { width, height, margin } = Settings.window;
+        const { width, height, margin } = Settings.map;
         if (nextX < width - margin && nextX > margin) {
             return true;
         }
@@ -91,7 +91,7 @@ export class Entity {
      * @returns true or false.
      */
     validateY(nextY) {
-        const { width, height, margin } = Settings.window;
+        const { width, height, margin } = Settings.map;
         if (nextY < height - margin && nextY > margin) {
             return true;
         }

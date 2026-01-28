@@ -8,9 +8,9 @@ const context = canvas.getContext("2d");
  * @param {*} y the y position
  * @param {*} angle the angle of drawing in radians
  */
-export function drawRotatedImage(image, x, y, angle) {
+export function drawRotatedImage(image, coordinates, angle) {
     context.save();
-    context.translate(x, y);
+    context.translate(coordinates.x, coordinates.y);
     context.rotate(angle);
     context.drawImage(image, -(image.width / 2), -(image.height / 2));
     context.restore();

@@ -19,7 +19,7 @@ export class Bullet extends Entity {
         this.moveX(this.nextX());
         this.moveY(this.nextY());
         super.update();
-        if (this.x < Settings.window.width && this.x > 0 && this.y > 0 && this.y < Settings.window.height && this.hitPoints > 0) {
+        if (this.x < Settings.map.width && this.x > 0 && this.y > 0 && this.y < Settings.map.height && this.hitPoints > 0) {
             return true;
         }
         else {
