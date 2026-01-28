@@ -117,3 +117,7 @@
   display: flex;
   justify-content: center;
 }
+
+.pixel {
+  image-rendering: pixelated;
+}

@@ -25,6 +25,6 @@ export function randomDecimal(min, max) {
  * @returns a list [x, y].
  */
 export function randomXY() {
-    return [randomInteger(Settings.window.margin, Settings.window.width - Settings.window.margin),
-    randomInteger(Settings.window.margin, Settings.window.height - Settings.window.margin)];
+    return [randomInteger(Settings.map.margin, Settings.map.width - Settings.map.margin),
+    randomInteger(Settings.map.margin, Settings.map.height - Settings.map.margin)];
 }

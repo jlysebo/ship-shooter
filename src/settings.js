@@ -4,6 +4,12 @@ export const Settings = {
     window: {
         width: 650,
         height: 650,
+        margin: 25,
+        visualPadding: 150
+    },
+    map: {
+        width: 1950,
+        height: 1950,
         margin: 25
     },
     sprite: {
@@ -29,13 +35,14 @@ export const Settings = {
         skull: "skull",
         shield: "shield",
         multishot: "multishot",
-        seashore_side: "seashore_side",
-        seashore_corner: "seashore_corner",
+        seashore_side: "seashore_side_bigger",
+        seashore_corner: "seashore_corner_bigger",
         sea_middle: "sea_middle",
         fighterjet: "fighterjet",
         mini_shield: "mini_shield",
         mini_shield_aura: "miniShieldAura",
         helicopter: "helicopter",
+        waves: "waves_bigger",
     }
 }
 
