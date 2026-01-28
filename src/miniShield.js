@@ -1,5 +1,8 @@
-export class miniShield {
+import { Item } from "./item.js";
+
+export class miniShield extends Item{
     constructor(x, y, range, time, hitPoints) {
+        super(30000);
         this.x = x;
         this.y = y;
         this.range = range;

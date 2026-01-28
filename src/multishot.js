@@ -1,5 +1,8 @@
-export class Multishot {
+import { Item } from "./item.js";
+
+export class Multishot extends Item {
     constructor(x, y, value) {
+        super(5000);
         this.x = x;
         this.y = y;
         this.value = value;
