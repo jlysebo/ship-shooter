@@ -139,10 +139,11 @@ function drawCanvas() {
     if (game.player.secondaryAbility instanceof miniShield) {
         drawRotatedImage(mini_shield_auraImg, visualXY({ x: game.player.x, y: game.player.y }), 0);
     }
-    function drawBoatLights(boatX, boatY, rotation) {
+    function drawBoatLights() {
         lightCtx.save();
-        lightCtx.translate(boatX, boatY);
-        lightCtx.rotate(rotation);
+        let boatPos = visualXY({ x: game.player.x, y: game.player.y });  // Convert to visual coords
+        lightCtx.translate(boatPos.x, boatPos.y);  // Use visual position
+        lightCtx.rotate(game.player.angle);
         lightCtx.globalCompositeOperation = 'destination-out';
 
         lightCtx.beginPath();
@@ -169,7 +170,7 @@ function drawCanvas() {
     fadeTime();
     
     if (lightCycle.daylightInt() > 0.5) {
-        drawBoatLights(game.player.x, game.player.y, game.player.angle);
+        drawBoatLights();
     }
 }
 
