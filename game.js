@@ -20,6 +20,7 @@ import { calculateAngle } from "./src/tools/angle.js";
 import { miniShield } from "./src/miniShield.js";
 import { ClusterMine } from "./src/clusterMine.js";
 import { helicopter } from "./src/helicopter.js";
+import { daylightCycle } from "./src/daylightCycle.js";
 
 let game = {};
 
@@ -137,6 +138,38 @@ function drawCanvas() {
     }
     if (game.player.secondaryAbility instanceof miniShield) {
         drawRotatedImage(mini_shield_auraImg, visualXY({ x: game.player.x, y: game.player.y }), 0);
+    }
+    function drawBoatLights(boatX, boatY, rotation) {
+        lightCtx.save();
+        lightCtx.translate(boatX, boatY);
+        lightCtx.rotate(rotation);
+        lightCtx.globalCompositeOperation = 'destination-out';
+
+        lightCtx.beginPath();
+        lightCtx.moveTo(0, 0);
+        lightCtx.lineTo(100, -50);
+        lightCtx.arcTo(130, 0, 100, 50, 30);
+        lightCtx.lineTo(100, 50);
+        lightCtx.lineTo(0, 0);
+        lightCtx.closePath();
+        lightCtx.fill();
+
+        lightCtx.restore();
+        lightCtx.globalCompositeOperation = 'source-over';
+    }
+
+    function fadeTime() {
+        let lightOpacity = lightCycle.daylightInt();
+        lightCtx.fillStyle = `rgba(0, 0, 0, ${lightOpacity})`;
+        lightCtx.fillRect(0,0, canvas.width, canvas.height);
+    }
+    //Daylight logic, progressing time, fading lights and drawing boatlights
+    lightCtx.clearRect(0, 0, Settings.window.width, Settings.window.height)
+    lightCycle.progressTime();
+    fadeTime();
+    
+    if (lightCycle.daylightInt() > 0.5) {
+        drawBoatLights(game.player.x, game.player.y, game.player.angle);
     }
 }
 
@@ -458,6 +491,11 @@ function gameLoop() {
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+const lightCanvas = document.getElementById('lightsCanvas');
+lightCanvas.width = canvas.width;
+lightCanvas.height = canvas.height;
+const lightCtx = lightCanvas.getContext('2d');
+
 
 const playerImg = document.getElementById(Settings.img.player);
 const cannonImg = document.getElementById(Settings.img.cannon);
@@ -499,6 +537,8 @@ const coinsLabel = document.getElementById("coin-value");
 const abilityLabel = document.getElementById("ability-status");
 const weaponLabel = document.getElementById("weapon-status");
 var startButtonValid = true;
+//Time Manager
+let lightCycle;
 
 
 
@@ -522,6 +562,7 @@ function continueGame() {
 // create new player and game
 function startGame() {
     const stats = new gameStats();
+    lightCycle = new daylightCycle(10000, 3000);
     game = {
         stats: stats,
         player: new Player(Settings.map.width / 2, Settings.map.height / 2, 0, 3, Settings.sprite.width, Settings.sprite.height, 3, stats),
