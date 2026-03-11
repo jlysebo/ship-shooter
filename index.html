@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <title>Shooter</title>
     <style>
-        canvas {
-            background: #eee;
+        .gameCanvas {
+            background: rgba(238, 238, 238, 0.5);
             display: block;
             margin: 0 auto;
         }
@@ -65,7 +65,10 @@
 
     </div>
     <div class="split right">
-        <canvas id="gameCanvas" width="650" height="650"></canvas>
+        <div class="canvasGroup">
+            <canvas id="gameCanvas" width="650" height="650"></canvas>
+            <canvas id="lightsCanvas" width="650" height="650"></canvas>
+        </div>
         <div class="button-container" id="button-container">
             <button id="start-button">Start New Game</button>
             <button id="continue-button" style="visibility: hidden;">Continue Game</button>
